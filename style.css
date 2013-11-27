@@ -1,0 +1,82 @@
+body {
+	color:#222;
+	font-family:"Lucida Grande","Tahoma","Verdana","Arial",sans-serif;
+	font-size:large;
+}
+
+#container {
+	position:absolute;
+	top:25px;
+	right:25px;
+	bottom:25px;
+	left:25px;
+	min-width:320px;
+	min-height:480px;
+}
+
+#title {
+	margin:0;
+}
+#description {
+	overflow:auto;
+	position:absolute;
+	top:60px;
+	right:0;
+	left:0;
+	height:44px;
+	margin:0;
+}
+#timer {
+	font-size:32px;
+	position:absolute;
+	top:5px;
+	right:0;
+}
+#submit-container {
+	position:absolute;
+	top:72%;
+	right:70%;
+	bottom:0;
+	left:0;
+}
+#submit {
+	background:green;
+	border:1px solid black;
+	color:white;
+	display:block;
+	font-size:6vmin;
+	height:100%;
+	width:100%;
+}
+#console {
+	background:#f7f7f7;
+	border:1px solid #999;
+	color:#444;
+	font-family:monospace;
+	overflow:auto;
+	position:absolute;
+	top:72%;
+	right:0;
+	bottom:0;
+	left:32%;
+}
+#console div {
+	padding:2.5px 5px;
+}
+#console .pass {
+	color:#80bf40;
+}
+#console .fail {
+	color:#ff3333;
+}
+
+.CodeMirror {
+	border:1px solid #999;
+	font-size:x-large;
+	position:absolute;
+	top:125px;
+	right:0;
+	bottom:30%;
+	left:0;
+	height:auto;
+}

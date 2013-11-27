@@ -3,34 +3,27 @@
 <head>
 	<title>assess.js</title>
 	<link rel="stylesheet" type="text/css" href="lib/codemirror/codemirror.css"/>
-	<style type="text/css">
-		body {
-			color:#222;
-			font-family:"Lucida Grande","Tahoma","Verdana","Arial",sans-serif;
-		}
-		.CodeMirror {border:1px solid #999;}
-		button[type=submit] {
-			background:green;
-			border:1px solid black;
-			color:white;
-			font-size:18px;
-			padding:10px;
-		}
-	</style>
+	<link rel="stylesheet" type="text/css" href="style.css"/>
 </head>
 <body>
-	<p id="description">
-		Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed tincidunt lobortis quam, eget volutpat orci tincidunt interdum. Sed quam nisi, scelerisque a elementum sed, condimentum quis felis. Etiam sit amet semper urna. Maecenas eu augue lacus. Proin tincidunt mauris eu purus porttitor pharetra eu ut orci. Vestibulum facilisis vehicula nisi, sed ornare lectus dignissim vitae. Sed sagittis gravida risus sed iaculis. Duis facilisis ullamcorper bibendum. Duis vitae iaculis diam, sit amet accumsan elit. Vivamus quis vehicula diam. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Proin tempus feugiat dui. Duis mattis dui aliquet magna tincidunt, a dictum nisl aliquet. Maecenas ac mi vitae nulla tincidunt tincidunt eget eu leo.
-	</p>
-	<p>
+	<div id="container">
+		<h1 id="title">Question</h1>
+		<p id="description">
+			Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+			Nulla faucibus scelerisque nibh, quis consectetur urna sodales eget.
+			Donec laoreet purus massa, sit amet facilisis leo dapibus non.
+		</p>
 		<textarea id="code" name="code">function foo(a) {
 	return a;
 }</textarea>
-	</p>
-	<p>
-		<button type="submit">Done!</button>
-		<time id="time">00:00</time>
-	</p>
+		<div id="submit-container">
+			<button type="submit" id="submit">Done!</button>
+		</div>
+		<time id="timer">00:00</time>
+		<div id="console">
+			<div>Press Done! to run tests and proceed to the next question</div>
+		</div>
+	</div>
 
 	<script type="text/javascript" src="lib/codemirror/codemirror.js"></script>
 	<script type="text/javascript" src="lib/codemirror/addon/edit/matchbrackets.js"></script>
