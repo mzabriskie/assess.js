@@ -39,9 +39,17 @@
 	// Simple router for handling hash changes
 	// TODO: Support events for load, beforeunload, etc.
 	// TODO: Handle route not found
-	// TODO: Allow defining routes in constructor options
-	function Router() {
+	function Router(options) {
 		this.routes = {};
+		options = options || {};
+
+		if (typeof options.routes !== 'undefined') {
+			for (var k in options.routes) {
+				if (options.routes.hasOwnProperty(k)) {
+					this.addRoute(k, options.routes[k]);
+				}
+			}
+		}
 
 		addEvent(window, 'hashchange', function () {
 			this.goto(this.getHash());
@@ -109,15 +117,12 @@
 					matchBrackets: true
 				});
 
-				this.router = new Router();
-				this.router.addRoute('/', function () {
-					console.log('Home');
-				});
-				this.router.addRoute('/content', function () {
-					console.log('Content');
-				});
-				this.router.addRoute('/q/:ID', function (ID) {
-					console.log('Question');
+				this.router = new Router({
+					routes: {
+						'/': function () { console.log('Home'); },
+						'/content': function () { console.log('Content'); },
+						'/q/:ID': function (ID) { console.log('Question'); }
+					}
 				});
 				this.router.goto();
 			}
