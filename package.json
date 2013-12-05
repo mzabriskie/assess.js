@@ -1,0 +1,19 @@
+{
+	"name": "assess.js",
+	"version": "0.0.0",
+	"description": "Framework for assessing JavaScript competency",
+	"author": "Matt Zabriskie",
+	"license": "MIT",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/mzabriskie/assess.js.git"
+	},
+	"scripts": {
+		"test": "grunt jshint"
+	},
+	"devDependencies": {
+		"grunt": "~0.4.0",
+		"grunt-contrib-jshint": "0.4.3",
+		"grunt-contrib-watch": "~0.3.1"
+	}
+}
