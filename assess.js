@@ -38,44 +38,43 @@
 
 	// Simple router for handling hash changes
 	// TODO: Support events for load, beforeunload, etc.
-	// TODO: Handle route not found
-	function Router(options) {
+	function Router() {
 		this.routes = {};
-		options = options || {};
-
-		if (typeof options.routes !== 'undefined') {
-			for (var k in options.routes) {
-				if (options.routes.hasOwnProperty(k)) {
-					this.addRoute(k, options.routes[k]);
-				}
-			}
-		}
+		this.fallback = null;
 
 		addEvent(window, 'hashchange', function () {
-			this.goto(this.getHash());
+			this.goto(this.hash());
 		}.bind(this));
 	}
 
-	Router.prototype.getHash = function () {
+	Router.prototype.hash = function () {
 		return window.location.hash.replace(/^#\/?/, '');
 	};
 
-	Router.prototype.addRoute = function (route, callback) {
+	Router.prototype.when = function (route, callback) {
 		route = trim(route);
 		if (route.indexOf('/') !== 0) {
 			route = '/' + route;
 		}
+
 		var pattern = route.replace(/\/(:[^\/]*)/g, '/([^\/]*)');
 		this.routes[route] = {
 			pattern: (route === pattern) ? null : new RegExp('^'+pattern+'$'),
 			callback: callback
 		};
+
+		return this;
+	};
+
+	Router.prototype.otherwise = function (callback) {
+		this.fallback = callback;
+		return this;
 	};
 
 	Router.prototype.goto = function (hash) {
 		hash = trim(hash);
 		if (hash.length === 0) {
-			hash = this.getHash();
+			hash = this.hash();
 		}
 		if (hash.indexOf('/') !== 0) {
 			hash = '/' + hash;
@@ -106,6 +105,8 @@
 
 		if (typeof route !== 'undefined' && typeof route.callback === 'function') {
 			route.callback.apply(null, args);
+		} else if (typeof this.fallback === 'function') {
+			this.fallback.call(null, hash);
 		}
 	};
 
@@ -117,14 +118,12 @@
 					matchBrackets: true
 				});
 
-				this.router = new Router({
-					routes: {
-						'/': function () { console.log('Home'); },
-						'/content': function () { console.log('Content'); },
-						'/q/:ID': function (ID) { console.log('Question'); }
-					}
-				});
-				this.router.goto();
+				new Router()
+					.when('/', function () { console.log('Home'); })
+					.when('/content', function () { console.log('Content'); })
+					.when('/q/:ID', function (ID) { console.log('Question'); })
+					.otherwise(function (hash) { console.log('Cannot find ' + hash); })
+					.goto();
 			}
 		};
 	};
