@@ -128,6 +128,18 @@
 					.when('/q/:ID', function (ID) { console.log('Question'); })
 					.otherwise(function (hash) { console.log('Cannot find ' + hash); })
 					.goto();
+
+				return this;
+			},
+			log: function (message, type) {
+				var out = document.createElement('div');
+				document.getElementById('console').appendChild(out);
+				out.innerHTML = message;
+				if (typeof type !== 'undefined') {
+					out.className = type;
+				}
+
+				return this;
 			}
 		};
 	};
