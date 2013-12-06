@@ -156,6 +156,34 @@
 	})();
 
 	window.assess = function () {
+
+		function duration(timeInMillis) {
+			var intervals = {
+					'm': 60000,
+					's': 1000
+				},
+				sb = '';
+
+			for (var k in intervals) {
+				if (!intervals.hasOwnProperty(k)) continue;
+
+				var v = intervals[k],
+					unit = Math.floor(timeInMillis / v);
+				timeInMillis %= v;
+
+				if (sb.length > 0) sb += ':';
+				if (unit < 10) unit = '0' + unit;
+				sb += unit;
+			}
+			return sb;
+		}
+
+		var lapsed = 0;
+		setInterval(function () {
+			lapsed += 1000;
+			document.getElementById('timer').innerHTML = duration(lapsed);
+		}, 1000);
+
 		return {
 			init: function () {
 				CodeMirror.fromTextArea(document.getElementById('code'), {
