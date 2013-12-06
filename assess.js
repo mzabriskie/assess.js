@@ -38,13 +38,12 @@
 		}
 
 		// Simple router for handling hash changes
-		// TODO: Support events for load, beforeunload, etc.
 		function Router() {
 			this.routes = {};
 			this.fallback = null;
 
 			addEvent(window, 'hashchange', function () {
-				this.goto(this.hash());
+				this.process(this.hash());
 			}.bind(this));
 		}
 
@@ -52,27 +51,30 @@
 			return window.location.hash.replace(/^#\/?/, '');
 		};
 
-		Router.prototype.when = function (route, callback) {
-			route = trim(route);
-			if (route.indexOf('/') !== 0) {
-				route = '/' + route;
+		Router.prototype.when = function (hash, callback) {
+			// Normalize hash
+			hash = trim(hash);
+			if (hash.indexOf('/') !== 0) {
+				hash = '/' + hash;
 			}
 
-			var pattern = route.replace(/\/(:[^\/]*)/g, '/([^\/]*)');
-			this.routes[route] = {
-				pattern: (route === pattern) ? null : new RegExp('^'+pattern+'$'),
-				callback: callback
-			};
+			var pattern = hash.replace(/\/(:[^\/]*)/g, '/([^\/]*)'),
+				route = typeof callback === 'object' ? callback : { callback: callback };
+
+			route.pattern = (hash === pattern) ? null : new RegExp('^' + pattern + '$');
+			this.routes[hash] = route;
 
 			return this;
 		};
 
 		Router.prototype.otherwise = function (callback) {
+			this.current = null;
 			this.fallback = callback;
 			return this;
 		};
 
-		Router.prototype.goto = function (hash) {
+		Router.prototype.process = function (hash) {
+			// Normalize hash
 			hash = trim(hash);
 			if (hash.length === 0) {
 				hash = this.hash();
@@ -81,12 +83,20 @@
 				hash = '/' + hash;
 			}
 
+			// Don't handle hash if it hasn't changed
+			if (this.current !== null && this.current.hash === hash) {
+				return;
+			}
+
+			// Find the route from hash
 			var route = this.routes[''],
 				args = null;
 			if (hash.length > 0) {
+				// Exact hash match
 				if (typeof this.routes[hash] !== 'undefined') {
 					route = this.routes[hash];
 				}
+				// Find hash matching pattern
 				else {
 					for (var k in this.routes) {
 						if (!this.routes.hasOwnProperty(k) ||
@@ -104,9 +114,40 @@
 				}
 			}
 
+			// Handle before unload if current route specified a handler
+			if (this.current !== null && typeof this.current.route.beforeunload === 'function') {
+				// Provide stoppable event
+				var event = {
+					stopped: false,
+					stop: function () {
+						this.stopped = true;
+					}
+				};
+
+				this.current.route.beforeunload.call(null, event);
+
+				// If event was stopped, reset hash
+				if (event.stopped) {
+					window.history.back();
+					return;
+				}
+			}
+
+			// Reset current route
+			this.current = null;
+
+			// Invoke matching route, if any
 			if (typeof route !== 'undefined' && typeof route.callback === 'function') {
 				route.callback.apply(null, args);
-			} else if (typeof this.fallback === 'function') {
+
+				// Update current route
+				this.current = {
+					hash: hash,
+					route: route
+				};
+			}
+			// Invoke fallback, if any
+			else if (typeof this.fallback === 'function') {
 				this.fallback.call(null, hash);
 			}
 		};
@@ -125,9 +166,12 @@
 				new Router()
 					.when('/', function () { console.log('Home'); })
 					.when('/content', function () { console.log('Content'); })
-					.when('/q/:ID', function (ID) { console.log('Question'); })
+					.when('/q/:ID', {
+						callback: function (ID) { console.log('Question'); },
+						beforeunload: function (e) { if (!confirm('Are you sure?')) { e.stop(); } }
+					})
 					.otherwise(function (hash) { console.log('Cannot find ' + hash); })
-					.goto();
+					.process();
 
 				return this;
 			},
