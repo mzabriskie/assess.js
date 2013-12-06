@@ -6,7 +6,24 @@
 	<link rel="stylesheet" type="text/css" href="style.css"/>
 </head>
 <body>
-	<div id="container">
+	<script id="home-template" type="text/x-handlebars-template">
+		<h1 id="title">Welcome</h1>
+	</script>
+
+	<script id="content-template" type="text/x-handlebars-template">
+		<h1 id="title">Content</h1>
+	</script>
+
+	<script id="results-template" type="text/x-handlebars-template">
+		<h1 id="title">Results</h1>
+	</script>
+
+	<script id="404-template" type="text/x-handlebars-template">
+		<h1 id="title">Page Not Found</h1>
+		<p>Oops! The page that you are looking for cannot be found.
+	</script>
+
+	<script id="question-template" type="text/x-handlebars-template">
 		<h1 id="title">Question</h1>
 		<p id="description">
 			Lorem ipsum dolor sit amet, consectetur adipiscing elit.
@@ -23,11 +40,14 @@
 		<div id="console">
 			<div>Press Done! to run tests and proceed to the next question</div>
 		</div>
-	</div>
+	</script>
+
+	<div id="container"></div>
 
 	<script src="lib/codemirror/codemirror.js"></script>
 	<script src="lib/codemirror/javascript.js"></script>
 	<script src="lib/codemirror/addon/edit/matchbrackets.js"></script>
+	<script src="lib/handlebars.js"></script>
 	<script src="assess.js"></script>
 	<script>assess().init();</script>
 </body>

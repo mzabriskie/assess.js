@@ -13,17 +13,6 @@
 			}
 		}
 
-		// Facade for removing DOM events
-		function removeEvent(el, event, handler) {
-			if (el.detachEvent) {
-				el.detachEvent('on' + event, handler);
-			} else if (el.removeEventListener) {
-				el.removeEventListener(event, handler, true);
-			} else {
-				el['on' + event] = null;
-			}
-		}
-
 		// Provide function binding for browsers that lack support (IE<9)
 		if (typeof Function.prototype.bind !== 'function') {
 			Function.prototype.bind = function (instance) {
@@ -207,21 +196,34 @@
 	})();
 
 	window.assess = function () {
+		var templates = {},
+			container = document.getElementById('container');
+		function renderContent(templateID, context) {
+			if (typeof templates[templateID] === 'undefined') {
+				var source = document.getElementById(templateID).innerHTML;
+				templates[templateID] = Handlebars.compile(source);
+			}
+
+			container.innerHTML = templates[templateID](context);
+		}
+
 		return {
 			init: function () {
-				CodeMirror.fromTextArea(document.getElementById('code'), {
-					lineNumbers: true,
-					matchBrackets: true
-				});
-
 				new Router()
-					.when('/', function () { console.log('Home'); })
-					.when('/content', function () { console.log('Content'); })
+					.when('/', function () { renderContent('home-template'); })
+					.when('/content', function () { renderContent('content-template'); })
 					.when('/q/:ID', {
-						callback: function (ID) { console.log('Question'); },
+						callback: function (ID) {
+							renderContent('question-template');
+
+							CodeMirror.fromTextArea(document.getElementById('code'), {
+								lineNumbers: true,
+								matchBrackets: true
+							});
+						},
 						beforeunload: function (e) { if (!confirm('Are you sure?')) { e.stop(); } }
 					})
-					.otherwise(function (hash) { console.log('Cannot find ' + hash); })
+					.otherwise(function () { renderContent('404-template'); })
 					.process();
 
 				this.timer = new Timer('timer').start();
