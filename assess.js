@@ -40,6 +40,18 @@
 			return window.location.hash.replace(/^#\/?/, '');
 		};
 
+		Router.prototype.goto = function (hash) {
+			// Normalize hash
+			hash = trim(hash);
+			if (hash.indexOf('/') !== 0) {
+				hash = '/' + hash;
+			}
+
+			window.location.hash = hash;
+
+			return this;
+		};
+
 		Router.prototype.when = function (hash, callback) {
 			// Normalize hash
 			hash = trim(hash);
@@ -113,7 +125,7 @@
 					}
 				};
 
-				this.current.route.beforeunload.call(null, event);
+				this.current.route.beforeunload.call(this, event);
 
 				// If event was stopped, reset hash
 				if (event.stopped) {
@@ -127,7 +139,7 @@
 
 			// Invoke matching route, if any
 			if (typeof route !== 'undefined' && typeof route.callback === 'function') {
-				route.callback.apply(null, args);
+				route.callback.apply(this, args);
 
 				// Update current route
 				this.current = {
@@ -137,8 +149,10 @@
 			}
 			// Invoke fallback, if any
 			else if (typeof this.fallback === 'function') {
-				this.fallback.call(null, hash);
+				this.fallback.call(this, hash);
 			}
+
+			return this;
 		};
 
 		return Router;
@@ -196,6 +210,7 @@
 	})();
 
 	window.assess = function () {
+		// Cache compiled templates and render to container
 		var templates = {},
 			container = document.getElementById('container');
 		function renderContent(templateID, context) {
@@ -207,26 +222,69 @@
 			container.innerHTML = templates[templateID](context);
 		}
 
+		// Handlebars helper to support math operations on @index
+		// http://jsfiddle.net/mpetrovich/wMmHS/
+		Handlebars.registerHelper('math', function(lvalue, operator, rvalue, options) {
+			if (arguments.length < 4) {
+				// Operator omitted, assuming "+"
+				options = rvalue;
+				rvalue = operator;
+				operator = '+';
+			}
+
+			lvalue = parseFloat(lvalue);
+			rvalue = parseFloat(rvalue);
+
+			return {
+				'+': lvalue + rvalue,
+				'-': lvalue - rvalue,
+				'*': lvalue * rvalue,
+				'/': lvalue / rvalue,
+				'%': lvalue % rvalue
+			}[operator];
+		});
+
+		var lapsed = 0,
+			timer = null;
+
 		return {
-			init: function () {
+			init: function (questions) {
 				new Router()
 					.when('/', function () { renderContent('home-template'); })
-					.when('/content', function () { renderContent('content-template'); })
+					.when('/content', function () { renderContent('content-template', {questions: questions}); })
+					.when('/results', function () { renderContent('results-template'); })
 					.when('/q/:ID', {
 						callback: function (ID) {
-							renderContent('question-template');
+							var index = parseInt(ID, 10) - 1,
+								hash = null;
+
+							if (index < 0) {
+								hash = '/q/1';
+							} else if (index >= questions.length) {
+								hash = '/q/' + questions.length;
+							}
+
+							if (hash !== null) {
+								this.goto(hash);
+								return;
+							}
+
+							renderContent('question-template', questions[index]);
 
 							CodeMirror.fromTextArea(document.getElementById('code'), {
 								lineNumbers: true,
 								matchBrackets: true
 							});
+
+							timer = new Timer('timer').start();
 						},
-						beforeunload: function (e) { if (!confirm('Are you sure?')) { e.stop(); } }
+						beforeunload: function (e) {
+							/*if (!confirm('Are you sure?')) { e.stop(); }*/
+							lapsed += timer.lapsed;
+						}
 					})
 					.otherwise(function () { renderContent('404-template'); })
 					.process();
-
-				this.timer = new Timer('timer').start();
 
 				return this;
 			},
