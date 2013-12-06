@@ -155,8 +155,8 @@
 		return Router;
 	})();
 
-	window.assess = function () {
-
+	var Timer = (function () {
+		// Format duration of time in milliseconds
 		function duration(timeInMillis) {
 			var intervals = {
 					'm': 60000,
@@ -178,12 +178,35 @@
 			return sb;
 		}
 
-		var lapsed = 0;
-		setInterval(function () {
-			lapsed += 1000;
-			document.getElementById('timer').innerHTML = duration(lapsed);
-		}, 1000);
+		function Timer(element) {
+			this.element = typeof element === 'string' ? document.getElementById(element) : element;
+			this.interval = null;
+			this.lapsed = 0;
+		}
 
+		Timer.prototype.start = function () {
+			var self = this;
+			this.interval = setInterval(function () {
+				self.lapsed += 1000;
+				self.element.innerHTML = duration(self.lapsed);
+			}, 1000);
+
+			return this;
+		};
+
+		Timer.prototype.stop = function () {
+			if (this.interval) {
+				clearInterval(this.interval);
+				this.interval = null;
+			}
+
+			return this;
+		};
+
+		return Timer;
+	})();
+
+	window.assess = function () {
 		return {
 			init: function () {
 				CodeMirror.fromTextArea(document.getElementById('code'), {
@@ -200,6 +223,8 @@
 					})
 					.otherwise(function (hash) { console.log('Cannot find ' + hash); })
 					.process();
+
+				this.timer = new Timer('timer').start();
 
 				return this;
 			},
