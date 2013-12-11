@@ -40,7 +40,7 @@
 			return window.location.hash.replace(/^#\/?/, '');
 		};
 
-		Router.prototype.goto = function (hash) {
+		Router.prototype.redirect = function (hash) {
 			// Normalize hash
 			hash = trim(hash);
 			if (hash.indexOf('/') !== 0) {
@@ -52,7 +52,7 @@
 			return this;
 		};
 
-		Router.prototype.when = function (hash, callback) {
+		Router.prototype.when = function (hash, controller) {
 			// Normalize hash
 			hash = trim(hash);
 			if (hash.indexOf('/') !== 0) {
@@ -60,7 +60,7 @@
 			}
 
 			var pattern = hash.replace(/\/(:[^\/]*)/g, '/([^\/]*)'),
-				route = typeof callback === 'object' ? callback : { callback: callback };
+				route = typeof controller === 'object' ? controller : { controller: controller };
 
 			route.pattern = (hash === pattern) ? null : new RegExp('^' + pattern + '$');
 			this.routes[hash] = route;
@@ -68,9 +68,9 @@
 			return this;
 		};
 
-		Router.prototype.otherwise = function (callback) {
+		Router.prototype.otherwise = function (controller) {
 			this.current = null;
-			this.fallback = callback;
+			this.fallback = controller;
 			return this;
 		};
 
@@ -138,8 +138,8 @@
 			this.current = null;
 
 			// Invoke matching route, if any
-			if (typeof route !== 'undefined' && typeof route.callback === 'function') {
-				route.callback.apply(this, args);
+			if (typeof route !== 'undefined' && typeof route.controller === 'function') {
+				route.controller.apply(this, args);
 
 				// Update current route
 				this.current = {
@@ -254,7 +254,7 @@
 					.when('/content', function () { renderContent('content-template', {questions: questions}); })
 					.when('/results', function () { renderContent('results-template'); })
 					.when('/q/:ID', {
-						callback: function (ID) {
+						controller: function (ID) {
 							var index = parseInt(ID, 10) - 1,
 								hash = null;
 
@@ -265,7 +265,7 @@
 							}
 
 							if (hash !== null) {
-								this.goto(hash);
+								this.redirect(hash);
 								return;
 							}
 
