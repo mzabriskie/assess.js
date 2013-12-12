@@ -26,6 +26,15 @@
 			return str ? String(str).replace(/\s+/g, '') : '';
 		}
 
+		// Normalize the hash
+		function normalize(hash) {
+			hash = trim(hash);
+			if (hash.indexOf('/') !== 0) {
+				hash = '/' + hash;
+			}
+			return hash;
+		}
+
 		// Simple router for handling hash changes
 		function Router() {
 			this.routes = {};
@@ -41,23 +50,13 @@
 		};
 
 		Router.prototype.redirect = function (hash) {
-			// Normalize hash
-			hash = trim(hash);
-			if (hash.indexOf('/') !== 0) {
-				hash = '/' + hash;
-			}
-
-			window.location.hash = hash;
+			window.location.hash = normalize(hash);
 
 			return this;
 		};
 
 		Router.prototype.when = function (hash, controller) {
-			// Normalize hash
-			hash = trim(hash);
-			if (hash.indexOf('/') !== 0) {
-				hash = '/' + hash;
-			}
+			hash = normalize(hash);
 
 			var pattern = hash.replace(/\/(:[^\/]*)/g, '/([^\/]*)'),
 				route = typeof controller === 'object' ? controller : { controller: controller };
@@ -75,14 +74,10 @@
 		};
 
 		Router.prototype.process = function (hash) {
-			// Normalize hash
-			hash = trim(hash);
-			if (hash.length === 0) {
+			if (typeof hash === 'undefined') {
 				hash = this.hash();
 			}
-			if (hash.indexOf('/') !== 0) {
-				hash = '/' + hash;
-			}
+			hash = normalize(hash);
 
 			// Don't handle hash if it hasn't changed
 			if (this.current !== null && this.current.hash === hash) {
