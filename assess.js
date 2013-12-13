@@ -81,7 +81,7 @@
 
 			// Don't handle hash if it hasn't changed
 			if (this.current !== null && this.current.hash === hash) {
-				return;
+				return this;
 			}
 
 			// Find the route from hash
@@ -125,7 +125,7 @@
 				// If event was stopped, reset hash
 				if (event.stopped) {
 					window.history.back();
-					return;
+					return this;
 				}
 			}
 
