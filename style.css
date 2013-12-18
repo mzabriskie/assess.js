@@ -69,6 +69,9 @@ body {
 #console .fail {
 	color:#ff3333;
 }
+#console .info {
+	color: #bf7632;
+}
 
 .CodeMirror {
 	border:1px solid #999;
