@@ -204,6 +204,40 @@
 		return Timer;
 	})();
 
+	var Assert = (function () {
+		function Assert(assertions, callback, interim, success, failure) {
+			this.assertions = assertions;
+			this.callback = callback;
+			this.interim = interim;
+			this.success = success;
+			this.failure = failure;
+		}
+
+		Assert.prototype.testAll = function () {
+			for (var i=0, l=this.assertions.length; i<l; i++) {
+				this.test(i);
+			}
+		};
+
+		Assert.prototype.test = function (index) {
+			var a = this.assertions[index],
+				r = null;
+			try {
+				this.interim.call(null, a.i);
+				r = this.callback.call(null, a.i);
+				if (r !== a.o) {
+					throw new Error();
+				} else {
+					this.success.call(null, index, r);
+				}
+			} catch (e) {
+				this.failure.call(null, index, a.o, r);
+			}
+		};
+
+		return Assert;
+	})();
+
 	window.assess = function () {
 		// Cache compiled templates and render to container
 		var templates = {},
@@ -242,7 +276,7 @@
 		var lapsed = 0,
 			timer = null;
 
-		return {
+		var assess = {
 			init: function (questions) {
 				new Router()
 					.when('/', function () { renderContent('home-template'); })
@@ -266,16 +300,43 @@
 
 							renderContent('question-template', questions[index]);
 
-							CodeMirror.fromTextArea(document.getElementById('code'), {
+
+							var failures = 0,
+								callback = null,
+								code, assert;
+
+							code = CodeMirror.fromTextArea(document.getElementById('code'), {
 								lineNumbers: true,
 								matchBrackets: true
 							});
 
 							timer = new Timer('timer').start();
+							assert = new Assert(questions[index].test,
+													function () { return callback.apply(null, arguments); },
+													function () { assess.log('Testing input "' + arguments[0] + '"...'); },
+													function () { assess.log(arguments[1] + ' is correct.', 'pass'); },
+													function () { assess.log('Expected ' + arguments[1] + ' but got ' + arguments[2], 'fail'); failures++; });
+
+							document.getElementById('submit').onclick = function () {
+								timer.stop();
+
+								// TODO: Gotta be something better than using eval
+								eval('callback = ' + code.getValue());
+
+								failures = 0;
+								assert.testAll();
+
+								if (failures > 0) {
+									timer.start();
+								} else {
+									assess.log('Nice work! Click Done! to continue to the next question.', 'info');
+								}
+							};
 						},
 						beforeunload: function (e) {
 							/*if (!confirm('Are you sure?')) { e.stop(); }*/
 							lapsed += timer.lapsed;
+							document.getElementById('submit').onclick = null;
 						}
 					})
 					.otherwise(function () { renderContent('404-template'); })
@@ -284,16 +345,20 @@
 				return this;
 			},
 			log: function (message, type) {
-				var out = document.createElement('div');
-				document.getElementById('console').appendChild(out);
+				var out = document.createElement('div'),
+					console = document.getElementById('console');
+				console.appendChild(out);
 				out.innerHTML = message;
 				if (typeof type !== 'undefined') {
 					out.className = type;
 				}
+				console.scrollTop = console.scrollHeight;
 
 				return this;
 			}
 		};
+
+		return assess;
 	};
 
 })(window);
