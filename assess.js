@@ -321,6 +321,7 @@
 								timer.stop();
 
 								// TODO: Gotta be something better than using eval
+								/*jshint evil:true*/
 								eval('callback = ' + code.getValue());
 
 								failures = 0;
