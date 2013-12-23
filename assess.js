@@ -283,7 +283,7 @@
 
 		var assess = {
 			init: function (questions) {
-				new Router()
+				var router = new Router()
 					.when('/', function () { renderContent('home-template'); })
 					.when('/content', function () { renderContent('content-template', {questions: questions}); })
 					.when('/results', function () { renderContent('results-template'); })
@@ -336,6 +336,18 @@
 									timer.start();
 								} else {
 									assess.log('Nice work! Click Done! to continue to the next question.', 'info');
+
+									// Update submit click handler to redirect to next screen
+									document.getElementById('submit').onclick = function () {
+										var hash = '';
+										if (index + 1 < questions.length) {
+											hash = '/q/' + (index + 2);
+										} else {
+											hash = '/results';
+										}
+										console.log(hash);
+										router.redirect(hash);
+									};
 								}
 							};
 						},
