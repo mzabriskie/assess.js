@@ -1,3 +1,11 @@
+html {
+	background-image:linear-gradient(#fafafa, #eaeaea);
+	background-image:-o-linear-gradient(#fafafa, #eaeaea);
+	background-image:-ms-linear-gradient(#fafafa, #eaeaea);
+	background-image:-moz-linear-gradient(#fafafa, #eaeaea);
+	background-image:-webkit-linear-gradient(#fafafa, #eaeaea);
+	height:100%;
+}
 body {
 	color:#222;
 	font-family:"Lucida Grande","Tahoma","Verdana","Arial",sans-serif;
@@ -49,7 +57,7 @@ body {
 	width:100%;
 }
 #console {
-	background:#f7f7f7;
+	background:#ffffff;
 	border:1px solid #999;
 	color:#444;
 	font-family:monospace;
