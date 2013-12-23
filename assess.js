@@ -214,11 +214,14 @@
 		}
 
 		Assert.prototype.testAll = function () {
+			var result = true;
 			for (var i=0, l=this.assertions.length; i<l; i++) {
 				if (!this.test(i)) {
-					return;
+					result = false;
+					break;
 				}
 			}
+			return result;
 		};
 
 		Assert.prototype.test = function (index) {
@@ -292,6 +295,7 @@
 							var index = parseInt(ID, 10) - 1,
 								hash = null;
 
+							// Validate requested hash
 							if (index < 0) {
 								hash = '/q/1';
 							} else if (index >= questions.length) {
@@ -303,11 +307,11 @@
 								return;
 							}
 
+							// Render tempalte
 							renderContent('question-template', questions[index]);
 
-
-							var failures = 0,
-								callback = null,
+							// Initialize CodeMirror, Timer and Assert
+							var callback = null,
 								code, assert;
 
 							code = CodeMirror.fromTextArea(document.getElementById('code'), {
@@ -320,8 +324,9 @@
 													function () { return callback.apply(null, arguments); },
 													function () { assess.log('Testing input "' + arguments[0] + '"...'); },
 													function () { assess.log(arguments[1] + ' is correct.', 'pass'); },
-													function () { assess.log('Expected ' + arguments[1] + ' but got ' + arguments[2], 'fail'); failures++; });
+													function () { assess.log('Expected ' + arguments[1] + ' but got ' + arguments[2], 'fail'); });
 
+							// Handle Done! click
 							document.getElementById('submit').onclick = function () {
 								timer.stop();
 
@@ -329,10 +334,7 @@
 								/*jshint evil:true*/
 								eval('callback = ' + code.getValue());
 
-								failures = 0;
-								assert.testAll();
-
-								if (failures > 0) {
+								if (!assert.testAll()) {
 									timer.start();
 								} else {
 									assess.log('Nice work! Click Done! to continue to the next question.', 'info');
@@ -345,7 +347,6 @@
 										} else {
 											hash = '/results';
 										}
-										console.log(hash);
 										router.redirect(hash);
 									};
 								}
