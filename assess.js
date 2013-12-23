@@ -215,13 +215,16 @@
 
 		Assert.prototype.testAll = function () {
 			for (var i=0, l=this.assertions.length; i<l; i++) {
-				this.test(i);
+				if (!this.test(i)) {
+					return;
+				}
 			}
 		};
 
 		Assert.prototype.test = function (index) {
 			var a = this.assertions[index],
-				r = null;
+				r = null,
+				v = false;
 			try {
 				this.interim.call(null, a.i);
 				r = this.callback.call(null, a.i);
@@ -229,10 +232,12 @@
 					throw new Error();
 				} else {
 					this.success.call(null, index, r);
+					v = true;
 				}
 			} catch (e) {
 				this.failure.call(null, index, a.o, r);
 			}
+			return v;
 		};
 
 		return Assert;
