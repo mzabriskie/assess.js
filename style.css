@@ -12,6 +12,19 @@ body {
 	font-size:large;
 }
 
+button {
+	background:green;
+	border:1px solid black;
+	color:white;
+	display:block;
+	font-size:6vmin;
+	padding:50px;
+}
+
+#start {
+	margin:100px auto;
+}
+
 #container {
 	position:absolute;
 	top:25px;
@@ -48,11 +61,6 @@ body {
 	left:0;
 }
 #submit {
-	background:green;
-	border:1px solid black;
-	color:white;
-	display:block;
-	font-size:6vmin;
 	height:100%;
 	width:100%;
 }
