@@ -1,4 +1,4 @@
-(function (window) {
+(function (window, document) {
 	'use strict';
 
 	var Router = (function () {
@@ -287,9 +287,15 @@
 		var assess = {
 			init: function (questions) {
 				var router = new Router()
-					.when('/', function () { renderContent('home-template'); })
+					.when('/', function () {
+						renderContent('home-template');
+
+						document.getElementById('start').onclick = function () {
+							this.redirect('/q/1');
+						}.bind(this);
+					})
 					.when('/content', function () { renderContent('content-template', {questions: questions}); })
-					.when('/results', function () { renderContent('results-template'); })
+					.when('/results', function () { renderContent('results-template', {questions: questions}); })
 					.when('/q/:ID', {
 						controller: function (ID) {
 							var index = parseInt(ID, 10) - 1,
@@ -380,4 +386,4 @@
 		return assess;
 	};
 
-})(window);
+})(window, document);
