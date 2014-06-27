@@ -1,27 +1,7 @@
-// Format duration of time in milliseconds
-function duration(timeInMillis) {
-	var intervals = {
-			'm': 60000,
-			's': 1000
-		},
-		sb = '';
+var util = require('util'),
+	EventEmitter = require('events').EventEmitter;
 
-	for (var k in intervals) {
-		if (!intervals.hasOwnProperty(k)) continue;
-
-		var v = intervals[k],
-			unit = Math.floor(timeInMillis / v);
-		timeInMillis %= v;
-
-		if (sb.length > 0) sb += ':';
-		if (unit < 10) unit = '0' + unit;
-		sb += unit;
-	}
-	return sb;
-}
-
-function Timer(element) {
-	this.element = typeof element === 'string' ? document.getElementById(element) : element;
+function Timer() {
 	this.interval = null;
 	this.lapsed = 0;
 }
@@ -30,7 +10,7 @@ Timer.prototype.start = function () {
 	var self = this;
 	this.interval = setInterval(function () {
 		self.lapsed += 1000;
-		self.element.innerHTML = duration(self.lapsed);
+		self.emit('tick', self);
 	}, 1000);
 
 	return this;
@@ -44,5 +24,14 @@ Timer.prototype.stop = function () {
 
 	return this;
 };
+
+Timer.prototype.reset = function () {
+	this.stop();
+	this.lapsed = 0;
+
+	return this;
+};
+
+util.inherits(Timer, EventEmitter);
 
 module.exports = Timer;

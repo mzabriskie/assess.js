@@ -17,6 +17,28 @@ module.exports = function () {
 		container.innerHTML = templates[templateID](context);
 	}
 
+	// Format duration of time in milliseconds
+	function duration(timeInMillis) {
+		var intervals = {
+				'm': 60000,
+				's': 1000
+			},
+			sb = '';
+
+		for (var k in intervals) {
+			if (!intervals.hasOwnProperty(k)) continue;
+
+			var v = intervals[k],
+				unit = Math.floor(timeInMillis / v);
+			timeInMillis %= v;
+
+			if (sb.length > 0) sb += ':';
+			if (unit < 10) unit = '0' + unit;
+			sb += unit;
+		}
+		return sb;
+	}
+
 	// Handlebars helper to support math operations on @index
 	// http://jsfiddle.net/mpetrovich/wMmHS/
 	Handlebars.registerHelper('math', function(lvalue, operator, rvalue, options) {
@@ -83,12 +105,17 @@ module.exports = function () {
 							matchBrackets: true
 						});
 
-						timer = new Timer('timer').start();
+						timer = new Timer().start();
 						assert = new Assert(questions[index].test,
 												function () { return callback.apply(null, arguments); },
 												function () { assess.log('Testing input "' + arguments[0] + '"...'); },
 												function () { assess.log(arguments[1] + ' is correct.', 'pass'); },
 												function () { assess.log('Expected ' + arguments[1] + ' but got ' + arguments[2], 'fail'); });
+
+						// Update lapsed time
+						timer.on('tick', function () {
+							document.getElementById('timer').innerHTML = duration(timer.lapsed);
+						});
 
 						// Handle Done! click
 						document.getElementById('submit').onclick = function () {
