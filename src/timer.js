@@ -6,6 +6,8 @@ function Timer() {
 	this.lapsed = 0;
 }
 
+util.inherits(Timer, EventEmitter);
+
 Timer.prototype.start = function () {
 	var self = this;
 	this.interval = setInterval(function () {
@@ -31,7 +33,5 @@ Timer.prototype.reset = function () {
 
 	return this;
 };
-
-util.inherits(Timer, EventEmitter);
 
 module.exports = Timer;
