@@ -18,22 +18,22 @@ Assert.prototype.testAll = function () {
 };
 
 Assert.prototype.test = function (index) {
-	var a = this.assertions[index],
-		r = null,
-		v = false;
+	var assertion = this.assertions[index],
+		output = null,
+		result = false;
 	try {
-		this.interim.call(null, a.i);
-		r = this.callback.call(null, a.i);
-		if (r !== a.o) {
+		this.interim.call(null, assertion.input);
+		output = this.callback.call(null, assertion.input);
+		if (output !== assertion.output) {
 			throw new Error();
 		} else {
-			this.success.call(null, index, r);
-			v = true;
+			this.success.call(null, index, output);
+			result = true;
 		}
 	} catch (e) {
-		this.failure.call(null, index, a.o, r);
+		this.failure.call(null, index, assertion.output, output);
 	}
-	return v;
+	return result;
 };
 
 module.exports = Assert;
