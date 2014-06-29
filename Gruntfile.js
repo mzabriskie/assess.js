@@ -4,12 +4,19 @@ module.exports = function (grunt) {
 
 	grunt.initConfig({
 		jshint: {
-			all: ['Gruntfile.js', 'assess.js', 'test/spec.js']
+			all: ['Gruntfile.js', 'src/**/*.js', 'test/**/*.js']
+		},
+		nodeunit: {
+			all: ['test/**/*.js']
 		},
 		watch: {
-			src: {
-				files: ['assess.js', 'test/spec.js'],
-				tasks: ['jshint']
+			all: {
+				files: ['src/**/*.js', 'test/**/*.js'],
+				tasks: ['default']
+			},
+			test: {
+				files: ['src/**/*.js', 'test/**/*.js'],
+				tasks: ['test']
 			}
 		},
 		uglify: {
@@ -32,7 +39,7 @@ module.exports = function (grunt) {
 		}
 	});
 
-	grunt.registerTask('test', ['jshint']);
+	grunt.registerTask('test', ['jshint', 'nodeunit']);
 	grunt.registerTask('publish', ['browserify:dist', 'uglify:dist']);
 	grunt.registerTask('default', ['test', 'publish']);
 };
