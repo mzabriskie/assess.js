@@ -44,8 +44,19 @@ button {
 	top:60px;
 	right:0;
 	left:0;
-	height:44px;
+	height:46px;
 	margin:0;
+}
+#description code {
+	background-color:#eee;
+	padding:0 5px 2px 5px;
+	font-size:19px;
+	font-family:"ff-tisa-web-pro", georgia;
+	display:inline-block;
+	border:1px solid #ddd;
+	border-radius:3px;
+	line-height:19px;
+	text-shadow:#fff 0 1px;
 }
 #timer {
 	font-size:32px;

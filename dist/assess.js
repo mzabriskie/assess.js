@@ -1094,6 +1094,11 @@ module.exports = function () {
 		}[operator];
 	});
 
+	// Stupid simple Markdown parser to allow code blocks
+	function markdown(md) {
+		return md.replace(/`(.*?)`/g, '<code>$1</code>');
+	}
+
 	var lapsed = 0,
 		timer = null;
 
@@ -1128,6 +1133,8 @@ module.exports = function () {
 
 						// Render tempalte
 						renderContent('question-template', questions[index]);
+						var description = document.getElementById('description');
+						description.innerHTML = markdown(description.innerHTML);
 
 						// Initialize CodeMirror, Timer and Assert
 						var callback = null,
