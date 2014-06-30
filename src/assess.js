@@ -125,20 +125,25 @@ module.exports = function () {
 						});
 
 						// Handle Done! click
-						document.getElementById('submit').onclick = function () {
+						var button = document.getElementById('submit');
+						button.onclick = function () {
+							button.disabled = true;
 							timer.stop();
 
 							// TODO: Gotta be something better than using eval
 							/*jshint evil:true*/
 							eval('callback = ' + code.getValue());
 
+							button.disabled = false;
+
 							if (!assert.testAll()) {
 								timer.start();
 							} else {
-								assess.log('Nice work! Click Done! to continue to the next question.', 'info');
+								assess.log('Nice work! Click Next to continue to the next question.', 'info');
 
 								// Update submit click handler to redirect to next screen
-								document.getElementById('submit').onclick = function () {
+								button.innerHTML = 'Next';
+								button.onclick = function () {
 									var hash = '';
 									if (index + 1 < questions.length) {
 										hash = '/q/' + (index + 2);

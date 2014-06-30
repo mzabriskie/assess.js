@@ -20,6 +20,12 @@ button {
 	font-size:6vmin;
 	padding:50px;
 }
+button[disabled] {
+	background: #cccccc;
+	border:1px solid #aaaaaa;
+	color: #aaaaaa;
+	text-shadow: 0 1px 0 white;
+}
 
 #start {
 	margin:100px auto;
