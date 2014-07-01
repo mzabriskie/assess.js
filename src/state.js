@@ -5,7 +5,6 @@
 			this.data = JSON.parse(localStorage.getItem(key));
 			if (this.data === null) {
 				this.data = {
-					lapsed: 0,
 					questions: []
 				};
 				this.sync();
@@ -16,13 +15,14 @@
 			localStorage.setItem(key, JSON.stringify(this.data));
 		},
 
-		setLapsedTime: function (lapsed) {
-			this.data.lapsed = lapsed;
-			this.sync();
-		},
-
 		getLapsedTime: function () {
-			return this.data.lapsed;
+			var lapsed = 0,
+				q = this.data.questions,
+				i = q.length;
+			while (i--) {
+				lapsed += q[i].lapsed || 0;
+			}
+			return lapsed;
 		},
 
 		getQuestions: function () {

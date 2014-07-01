@@ -1211,7 +1211,7 @@ module.exports = function () {
 						var button = document.getElementById('submit');
 
 						// Initialize Question
-						var q = State.getQuestion(ID) || {ID: ID, lapsed: 0, attempts: 0, solution: null, completed: false};
+						var q = State.getQuestion(ID) || {ID: ID, lapsed: 0, attempts: 0, completed: false, solution: null};
 						State.setQuestion(q);
 
 						// Check Read Only state
@@ -1235,7 +1235,7 @@ module.exports = function () {
 							q.lapsed = timer.lapsed;
 							State.setQuestion(q);
 
-							document.getElementById('timer').innerHTML = duration(State.getLapsedTime() + timer.lapsed);
+							document.getElementById('timer').innerHTML = duration(State.getLapsedTime());
 						}
 
 						function updateSolution() {
@@ -1322,7 +1322,6 @@ module.exports = function () {
 					beforeunload: function (e) {
 						if (timer) {
 							timer.stop();
-							State.setLapsedTime(State.getLapsedTime() + timer.lapsed);
 						}
 						if (interval) {
 							clearTimeout(interval);
@@ -1520,7 +1519,6 @@ if (typeof module !== 'undefined') {
 			this.data = JSON.parse(localStorage.getItem(key));
 			if (this.data === null) {
 				this.data = {
-					lapsed: 0,
 					questions: []
 				};
 				this.sync();
@@ -1531,13 +1529,14 @@ if (typeof module !== 'undefined') {
 			localStorage.setItem(key, JSON.stringify(this.data));
 		},
 
-		setLapsedTime: function (lapsed) {
-			this.data.lapsed = lapsed;
-			this.sync();
-		},
-
 		getLapsedTime: function () {
-			return this.data.lapsed;
+			var lapsed = 0,
+				q = this.data.questions,
+				i = q.length;
+			while (i--) {
+				lapsed += q[i].lapsed || 0;
+			}
+			return lapsed;
 		},
 
 		getQuestions: function () {

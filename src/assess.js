@@ -127,7 +127,7 @@ module.exports = function () {
 						var button = document.getElementById('submit');
 
 						// Initialize Question
-						var q = State.getQuestion(ID) || {ID: ID, lapsed: 0, attempts: 0, solution: null, completed: false};
+						var q = State.getQuestion(ID) || {ID: ID, lapsed: 0, attempts: 0, completed: false, solution: null};
 						State.setQuestion(q);
 
 						// Check Read Only state
@@ -151,7 +151,7 @@ module.exports = function () {
 							q.lapsed = timer.lapsed;
 							State.setQuestion(q);
 
-							document.getElementById('timer').innerHTML = duration(State.getLapsedTime() + timer.lapsed);
+							document.getElementById('timer').innerHTML = duration(State.getLapsedTime());
 						}
 
 						function updateSolution() {
@@ -238,7 +238,6 @@ module.exports = function () {
 					beforeunload: function (e) {
 						if (timer) {
 							timer.stop();
-							State.setLapsedTime(State.getLapsedTime() + timer.lapsed);
 						}
 						if (interval) {
 							clearTimeout(interval);

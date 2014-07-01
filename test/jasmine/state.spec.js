@@ -1,17 +1,18 @@
 describe('assess.js', function () {
 	var data = {
-		lapsed: 37,
 		questions: [
 			{
 				ID: 1,
 				lapsed: 10,
 				attempts: 1,
+				completed: true,
 				solution: 'function reverse(str) { return str.split(\'\').reverse().join(\'\'); }'
 			},
 			{
 				ID: 2,
 				lapsed: 27,
 				attempts: 2,
+				completed: true,
 				solution: 'function multiply(val) { return parseInt(val, 10) * 2; }'
 			}
 		]
@@ -35,14 +36,7 @@ describe('assess.js', function () {
 			localStorage.clear();
 			State.init();
 
-			expect(State.data).toEqual({lapsed: 0, questions: []});
-		});
-
-		it('should set lapsed time', function () {
-			State.setLapsedTime(100);
-
-			expect(State.data.lapsed).toEqual(100);
-			expect(getData().lapsed).toEqual(100);
+			expect(State.data).toEqual({questions: []});
 		});
 
 		it('should get lapsed time', function () {
