@@ -1012,11 +1012,13 @@ Assert.prototype.testAll = function () {
 
 Assert.prototype.test = function (index) {
 	var assertion = this.assertions[index],
+		input = Array.isArray(assertion.input) ? assertion.input : [assertion.input],
 		output = null,
 		result = false;
+
 	try {
-		this.interim.call(null, assertion.input);
-		output = this.callback.call(null, assertion.input);
+		this.interim.apply(null, input);
+		output = this.callback.apply(null, input);
 		if (!compare(output, assertion.output)) {
 			throw new Error();
 		} else {
@@ -1026,6 +1028,7 @@ Assert.prototype.test = function (index) {
 	} catch (e) {
 		this.failure.call(null, index, assertion.output, output);
 	}
+
 	return result;
 };
 

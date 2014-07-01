@@ -46,6 +46,19 @@ module.exports = {
 		test.done();
 	},
 
+	testAssertionsMultiArgs: function (test) {
+		this.assert.assertions = [
+			{input: [1, 2], output: 3}
+		];
+
+		this.assert.callback = function (a, b) {
+			return a + b;
+		};
+
+		test.equals(this.assert.testAll(), true);
+		test.done();
+	},
+
 	testCallback: function (test) {
 		test.equals(this.assert.callback, callback);
 
@@ -149,9 +162,9 @@ module.exports = {
 		}
 
 		this.assert.assertions = [
-			{input: [1, 2, 3], output: [1, 2, 3, 1, 2, 3]},
-			{input: [4, 5, 6], output: [4, 5, 6, 4, 5, 6]},
-			{input: [0, 1, 1, 2, 3, 5], output: [0, 1, 1, 2, 3, 5, 0, 1, 1, 2, 3, 5]}
+			{input: [[1, 2, 3]], output: [1, 2, 3, 1, 2, 3]},
+			{input: [[4, 5, 6]], output: [4, 5, 6, 4, 5, 6]},
+			{input: [[0, 1, 1, 2, 3, 5]], output: [0, 1, 1, 2, 3, 5, 0, 1, 1, 2, 3, 5]}
 		];
 		this.assert.callback = function (arr) {
 			return duplicate(arr);
