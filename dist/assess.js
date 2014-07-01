@@ -1151,7 +1151,8 @@ module.exports = function () {
 		return new Handlebars.SafeString(text.replace(/`(.*?)`/g, '<code>$1</code>'));
 	});
 
-	var timer = null;
+	var timer = null,
+		interval = null;
 
 	var assess = {
 		init: function (questions) {
@@ -1210,12 +1211,12 @@ module.exports = function () {
 						var button = document.getElementById('submit');
 
 						// Initialize Question
-						var q = State.getQuestion(ID) || {ID: ID, lapsed: 0, attempts: 0, solution: null};
+						var q = State.getQuestion(ID) || {ID: ID, lapsed: 0, attempts: 0, solution: null, completed: false};
 						State.setQuestion(q);
 
 						// Check Read Only state
-						var readOnly = q.solution !== null;
-						if (readOnly) {
+						var readOnly = q.completed;
+						if (q.solution) {
 							document.getElementById('code').value = q.solution;
 						}
 
@@ -1235,6 +1236,11 @@ module.exports = function () {
 							State.setQuestion(q);
 
 							document.getElementById('timer').innerHTML = duration(State.getLapsedTime() + timer.lapsed);
+						}
+
+						function updateSolution() {
+							q.solution = code.getValue();
+							State.setQuestion(q);
 						}
 
 						function handleSubmitClick() {
@@ -1259,8 +1265,8 @@ module.exports = function () {
 							if (!assert.testAll()) {
 								timer.start();
 							} else {
-								q.solution = code.getValue();
-								State.setQuestion(q);
+								q.completed = true;
+								updateSolution();
 
 								assess.log('Nice work! Click Next to continue to the next question.', 'info');
 
@@ -1279,6 +1285,9 @@ module.exports = function () {
 							}
 							router.redirect(hash);
 						}
+
+						// Sync solution on interval
+						interval = setInterval(updateSolution, 250);
 
 						// Only hook up assert and timer if solution hasn't already been provided
 						if (!readOnly) {
@@ -1311,10 +1320,12 @@ module.exports = function () {
 						}
 					},
 					beforeunload: function (e) {
-						// TODO: Persist code value if it hasn't already
 						if (timer) {
 							timer.stop();
 							State.setLapsedTime(State.getLapsedTime() + timer.lapsed);
+						}
+						if (interval) {
+							clearTimeout(interval);
 						}
 						document.getElementById('submit').onclick = null;
 					}
