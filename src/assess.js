@@ -40,6 +40,23 @@ module.exports = function () {
 		return sb;
 	}
 
+	// Handle meta + Enter
+	function handleMetaEnter(f) {
+		return function (e) {
+			if (e.keyCode === 13 && e.metaKey === true) {
+				if (typeof e.stop === 'function') {
+					e.stop();
+				}
+				if (typeof e.preventDefault === 'function') {
+					e.preventDefault();
+				}
+				if (typeof f === 'function') {
+					f();
+				}
+			}
+		};
+	}
+
 	// Handlebars helper to support math operations on @index
 	// http://jsfiddle.net/mpetrovich/wMmHS/
 	Handlebars.registerHelper('math', function(lvalue, operator, rvalue, options) {
@@ -189,6 +206,7 @@ module.exports = function () {
 								// Update submit click handler to redirect to next screen
 								button.innerHTML = 'Next';
 								button.onclick = handleNextClick;
+								window.onkeydown = handleMetaEnter(handleNextClick);
 							}
 						}
 
@@ -222,6 +240,9 @@ module.exports = function () {
 
 							// Handle Done! click
 							button.onclick = handleSubmitClick;
+
+							// Handle ⌘+Enter
+							window.onkeydown = handleMetaEnter(handleSubmitClick);
 						} else {
 							// Update lapsed time
 							document.getElementById('timer').innerHTML = duration(State.getLapsedTime());
@@ -243,6 +264,7 @@ module.exports = function () {
 							clearTimeout(interval);
 						}
 						document.getElementById('submit').onclick = null;
+						window.onkeydown = null;
 					}
 				})
 				.otherwise(function () { renderContent('404-template'); })
