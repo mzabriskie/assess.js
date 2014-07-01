@@ -43,6 +43,9 @@ function compare(val1, val2) {
 	if (Array.isArray(val1) && Array.isArray(val2)) {
 		return compareArray(val1, val2);
 	}
+	else if (typeof val1 === 'object' && typeof val2 === 'object') {
+		return compareObject(val1, val2);
+	}
 	else {
 		return val1 === val2;
 	}
@@ -55,6 +58,28 @@ function compareArray(arr1, arr2) {
 
 	for (var i=0, l=arr1.length; i<l; i++) {
 		if (!compare(arr1[i], arr2[i])) {
+			return false;
+		}
+	}
+
+	return true;
+}
+
+function compareObject(obj1, obj2) {
+	if (obj1 === null && obj2 === null) {
+		return true;
+	}
+
+	var keys1 = Object.keys(obj1),
+		keys2 = Object.keys(obj2);
+
+	if (!compareArray(keys1, keys2)) {
+		return false;
+	}
+
+	for (var i=0, l=keys1.length; i<l; i++) {
+		var key = keys1[i];
+		if (!compare(obj1[key], obj2[key])) {
 			return false;
 		}
 	}

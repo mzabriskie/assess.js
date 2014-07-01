@@ -172,5 +172,22 @@ module.exports = {
 
 		test.equals(this.assert.testAll(), true);
 		test.done();
+	},
+
+	testObectValue: function (test) {
+		this.assert.assertions = [
+			{input: [{a: 1, b: 2}, {a: 9, c: 3, d: 4}], output: {a: 9, b: 2, c: 3, d: 4}}
+		];
+		this.assert.callback = function (a, b) {
+			for (var k in b) {
+				if (b.hasOwnProperty(k)) {
+					a[k] = b[k];
+				}
+			}
+			return a;
+		};
+
+		test.equals(this.assert.testAll(), true);
+		test.done();
 	}
 };
