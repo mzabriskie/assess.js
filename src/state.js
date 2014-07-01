@@ -4,7 +4,10 @@
 		init: function () {
 			this.data = JSON.parse(localStorage.getItem(key));
 			if (this.data === null) {
-				this.data = {};
+				this.data = {
+					lapsed: 0,
+					questions: []
+				};
 				this.sync();
 			}
 		},

@@ -35,7 +35,7 @@ describe('assess.js', function () {
 			localStorage.clear();
 			State.init();
 
-			expect(State.data).toEqual({});
+			expect(State.data).toEqual({lapsed: 0, questions: []});
 		});
 
 		it('should set lapsed time', function () {
