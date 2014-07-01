@@ -24,7 +24,7 @@ Assert.prototype.test = function (index) {
 	try {
 		this.interim.call(null, assertion.input);
 		output = this.callback.call(null, assertion.input);
-		if (output !== assertion.output) {
+		if (!compare(output, assertion.output)) {
 			throw new Error();
 		} else {
 			this.success.call(null, index, output);
@@ -35,5 +35,28 @@ Assert.prototype.test = function (index) {
 	}
 	return result;
 };
+
+function compare(val1, val2) {
+	if (Array.isArray(val1) && Array.isArray(val2)) {
+		return compareArray(val1, val2);
+	}
+	else {
+		return val1 === val2;
+	}
+}
+
+function compareArray(arr1, arr2) {
+	if (arr1.length !== arr2.length) {
+		return false;
+	}
+
+	for (var i=0, l=arr1.length; i<l; i++) {
+		if (!compare(arr1[i], arr2[i])) {
+			return false;
+		}
+	}
+
+	return true;
+}
 
 module.exports = Assert;

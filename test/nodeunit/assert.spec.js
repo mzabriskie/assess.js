@@ -137,5 +137,27 @@ module.exports = {
 		this.assert.callback = doMath;
 		test.equals(this.assert.test(0), true);
 		test.done();
+	},
+
+	testArrayValue: function (test) {
+		function duplicate(arr) {
+			var l = arr.length;
+			for (var i=0; i<l; i++) {
+				arr.push(arr[i]);
+			}
+			return arr;
+		}
+
+		this.assert.assertions = [
+			{input: [1, 2, 3], output: [1, 2, 3, 1, 2, 3]},
+			{input: [4, 5, 6], output: [4, 5, 6, 4, 5, 6]},
+			{input: [0, 1, 1, 2, 3, 5], output: [0, 1, 1, 2, 3, 5, 0, 1, 1, 2, 3, 5]}
+		];
+		this.assert.callback = function (arr) {
+			return duplicate(arr);
+		};
+
+		test.equals(this.assert.testAll(), true);
+		test.done();
 	}
 };
