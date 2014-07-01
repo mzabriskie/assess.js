@@ -26,11 +26,12 @@ module.exports = function () {
 			},
 			sb = '';
 
-		for (var k in intervals) {
+		var k, v, unit;
+		for (k in intervals) {
 			if (!intervals.hasOwnProperty(k)) continue;
 
-			var v = intervals[k],
-				unit = Math.floor(timeInMillis / v);
+			v = intervals[k];
+			unit = Math.floor(timeInMillis / v);
 			timeInMillis %= v;
 
 			if (sb.length > 0) sb += ':';
@@ -62,7 +63,6 @@ module.exports = function () {
 	Handlebars.registerHelper('math', function(lvalue, operator, rvalue, options) {
 		if (arguments.length < 4) {
 			// Operator omitted, assuming "+"
-			options = rvalue;
 			rvalue = operator;
 			operator = '+';
 		}
@@ -255,7 +255,7 @@ module.exports = function () {
 							assess.log('Click Next to continue to the next question.', 'info');
 						}
 					},
-					beforeunload: function (e) {
+					beforeunload: function () {
 						if (timer) {
 							timer.stop();
 						}
