@@ -12,6 +12,18 @@ body {
 	font-size:large;
 }
 
+code {
+	background-color:#eee;
+	padding:0 5px 2px 5px;
+	font-size:19px;
+	font-family:"ff-tisa-web-pro", georgia;
+	display:inline-block;
+	border:1px solid #ddd;
+	border-radius:3px;
+	line-height:19px;
+	text-shadow:#fff 0 1px;
+}
+
 button {
 	background:green;
 	border:1px solid black;
@@ -52,17 +64,6 @@ button[disabled] {
 	left:0;
 	height:46px;
 	margin:0;
-}
-#description code {
-	background-color:#eee;
-	padding:0 5px 2px 5px;
-	font-size:19px;
-	font-family:"ff-tisa-web-pro", georgia;
-	display:inline-block;
-	border:1px solid #ddd;
-	border-radius:3px;
-	line-height:19px;
-	text-shadow:#fff 0 1px;
 }
 #progress {
 	color:rgba(0,0,0,.3);
