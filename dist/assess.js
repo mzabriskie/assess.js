@@ -1159,9 +1159,11 @@ module.exports = function () {
 												function () { assess.log('Expected ' + arguments[1] + ' but got ' + arguments[2], 'fail'); });
 
 						// Update lapsed time
-						timer.on('tick', function () {
-							document.getElementById('timer').innerHTML = duration(timer.lapsed);
-						});
+						function updateLapsedTime() {
+							document.getElementById('timer').innerHTML = duration(lapsed + timer.lapsed);
+						}
+						timer.on('tick', updateLapsedTime);
+						updateLapsedTime();
 
 						// Handle Done! click
 						var button = document.getElementById('submit');
