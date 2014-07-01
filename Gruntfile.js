@@ -28,6 +28,14 @@ module.exports = function (grunt) {
 			test: {
 				files: ['src/**/*.js', 'test/**/*.js'],
 				tasks: ['test']
+			},
+			nodeunit: {
+				files: ['src/**/*.js', 'test/nodeunit/**/*.js'],
+				tasks: ['nodeunit']
+			},
+			karma: {
+				files: ['src/**/*.js', 'test/jasmine/**/*.js'],
+				tasks: ['karma:single']
 			}
 		},
 		uglify: {
