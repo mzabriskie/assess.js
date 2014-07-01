@@ -59,5 +59,9 @@ describe('assess.js', function () {
 		it('should get single question', function () {
 			expect(State.getQuestion(1)).toEqual(data.questions[0]);
 		});
+
+		it('should initialize question', function () {
+			expect(State.getQuestion(3)).toEqual({ID: 3, lapsed: 0, attempts: 0, completed: false, solution: null});
+		});
 	});
 });

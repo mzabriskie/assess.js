@@ -100,7 +100,6 @@ module.exports = function () {
 					}.bind(this);
 				})
 				.when('/results', function () {
-					// TODO: Skipping question results in error (/q/1 -> /results)
 					var qs = [];
 					for (var i=0, l=questions.length; i<l; i++) {
 						var q = questions[i],
@@ -144,7 +143,7 @@ module.exports = function () {
 						var button = document.getElementById('submit');
 
 						// Initialize Question
-						var q = State.getQuestion(ID) || {ID: ID, lapsed: 0, attempts: 0, completed: false, solution: null};
+						var q = State.getQuestion(ID);
 						State.setQuestion(q);
 
 						// Check Read Only state

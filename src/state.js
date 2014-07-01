@@ -35,7 +35,7 @@
 		},
 
 		getQuestion: function (ID) {
-			return this.data.questions[ID - 1];
+			return this.data.questions[ID - 1] || {ID: ID, lapsed: 0, attempts: 0, completed: false, solution: null};
 		}
 	};
 
