@@ -1132,7 +1132,13 @@ module.exports = function () {
 						}
 
 						// Render tempalte
-						renderContent('question-template', questions[index]);
+						renderContent('question-template', {
+							question: questions[index],
+							progress: {
+								current: (index+1),
+								total: questions.length
+							}
+						});
 						var description = document.getElementById('description');
 						description.innerHTML = markdown(description.innerHTML);
 

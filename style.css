@@ -64,10 +64,16 @@ button[disabled] {
 	line-height:19px;
 	text-shadow:#fff 0 1px;
 }
+#progress {
+	color:rgba(0,0,0,.3);
+	position:absolute;
+	top:38px;
+	right:0;
+}
 #timer {
 	font-size:32px;
 	position:absolute;
-	top:5px;
+	top:3px;
 	right:0;
 }
 #submit-container {
