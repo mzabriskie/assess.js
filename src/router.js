@@ -1,3 +1,5 @@
+(function () {
+
 // Facade for adding DOM events
 function addEvent(el, event, handler) {
 	if (el.attachEvent) {
@@ -25,6 +27,9 @@ function trim(str) {
 // Normalize the hash
 function normalize(hash) {
 	hash = trim(hash);
+	if (hash.indexOf('#') === 0) {
+		hash = hash.substring(1);
+	}
 	if (hash.indexOf('/') !== 0) {
 		hash = '/' + hash;
 	}
@@ -42,7 +47,7 @@ function Router() {
 }
 
 Router.prototype.hash = function () {
-	return window.location.hash.replace(/^#\/?/, '');
+	return window.location.hash.replace(/^#?/, '');
 };
 
 Router.prototype.redirect = function (hash) {
@@ -76,7 +81,7 @@ Router.prototype.process = function (hash) {
 	hash = normalize(hash);
 
 	// Don't handle hash if it hasn't changed
-	if (this.current !== null && this.current.hash === hash) {
+	if (this.current != null && this.current.hash === hash) {
 		return this;
 	}
 
@@ -107,7 +112,7 @@ Router.prototype.process = function (hash) {
 	}
 
 	// Handle before unload if current route specified a handler
-	if (this.current !== null && typeof this.current.route.beforeunload === 'function') {
+	if (this.current != null && typeof this.current.route.beforeunload === 'function') {
 		// Provide stoppable event
 		var event = {
 			stopped: false,
@@ -146,4 +151,10 @@ Router.prototype.process = function (hash) {
 	return this;
 };
 
-module.exports = Router;
+if (typeof module !== 'undefined') {
+	module.exports = Router;
+} else {
+	this.Router = Router;
+}
+
+}).call(this);
