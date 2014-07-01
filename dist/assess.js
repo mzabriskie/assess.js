@@ -1138,6 +1138,7 @@ module.exports = function () {
 					}.bind(this);
 				})
 				.when('/results', function () {
+					// TODO: Skipping question results in error (/q/1 -> /results)
 					var qs = [];
 					for (var i=0, l=questions.length; i<l; i++) {
 						var q = questions[i],
@@ -1395,7 +1396,7 @@ Router.prototype.process = function (hash) {
 	hash = normalize(hash);
 
 	// Don't handle hash if it hasn't changed
-	if (this.current != null && this.current.hash === hash) {
+	if (this.current && this.current.hash === hash) {
 		return this;
 	}
 
@@ -1426,7 +1427,7 @@ Router.prototype.process = function (hash) {
 	}
 
 	// Handle before unload if current route specified a handler
-	if (this.current != null && typeof this.current.route.beforeunload === 'function') {
+	if (this.current && typeof this.current.route.beforeunload === 'function') {
 		// Provide stoppable event
 		var event = {
 			stopped: false,
