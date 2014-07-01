@@ -11,29 +11,18 @@
 		<button id="start">Start</button>
 	</script>
 
-	<script id="content-template" type="text/x-handlebars-template">
-		<h1 id="title">Content</h1>
-		<ul>
-			{{#each questions}}
-			<li>
-				<a href="#/q/{{ math @index '+' 1 }}">{{ name }}</a>
-				<p>{{ description }}</p>
-			</li>
-			{{/each}}
-		</ul>
-	</script>
-
 	<script id="results-template" type="text/x-handlebars-template">
 		<h1 id="title">Results</h1>
 		<ul>
 			{{#each questions}}
 			<li>
 				<a href="#/q/{{ math @index '+' 1 }}">{{ name }}</a>
-				<span>{{ attempts }} attempts - {{ timer.lapsed }}</span>
-				<p>{{ description }}</p>
+				<span>{{ attempts }} attempts - {{ lapsed }}</span>
+				<p>{{ markdown description }}</p>
 			</li>
 			{{/each}}
 		</ul>
+		<div>Total time: {{ lapsed }}</div>
 	</script>
 
 	<script id="404-template" type="text/x-handlebars-template">
@@ -45,7 +34,7 @@
 		<h1 id="title">{{ question.name }}</h1>
 		<time id="timer">00:00</time>
 		<div id="progress">Question {{ progress.current }}/{{ progress.total }}</div>
-		<p id="description">{{ question.description }}</p>
+		<p id="description">{{ markdown question.description }}</p>
 		<textarea id="code" name="code">{{ question.template }}</textarea>
 		<div id="submit-container">
 			<button type="submit" id="submit">Done!</button>
