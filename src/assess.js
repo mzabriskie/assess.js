@@ -211,6 +211,7 @@ module.exports = function () {
 					beforeunload: function (e) {
 						/*if (!confirm('Are you sure?')) { e.stop(); }*/
 						if (timer) {
+							timer.stop();
 							State.setLapsedTime(State.getLapsedTime() + timer.lapsed);
 						}
 						document.getElementById('submit').onclick = null;
