@@ -62,10 +62,10 @@ module.exports = function () {
 		}[operator];
 	});
 
-	// Stupid simple Markdown parser to allow code blocks
-	function markdown(md) {
-		return md.replace(/`(.*?)`/g, '<code>$1</code>');
-	}
+	// Handlebars helper to support simple Markdown
+	Handlebars.registerHelper('markdown', function (text) {
+		return new Handlebars.SafeString(text.replace(/`(.*?)`/g, '<code>$1</code>'));
+	});
 
 	var timer = null;
 
@@ -81,8 +81,21 @@ module.exports = function () {
 						this.redirect('/q/1');
 					}.bind(this);
 				})
-				.when('/content', function () { renderContent('content-template', {questions: questions}); })
-				.when('/results', function () { renderContent('results-template', {questions: questions}); })
+				.when('/results', function () {
+					var qs = [];
+					for (var i=0, l=questions.length; i<l; i++) {
+						var q = questions[i],
+							s = State.getQuestion(i+1);
+						qs[i] = {
+							name: q.name,
+							description: q.description,
+							attempts: s.attempts,
+							lapsed: duration(s.lapsed)
+						};
+					}
+
+					renderContent('results-template', {lapsed: duration(State.getLapsedTime()), questions: qs});
+				})
 				.when('/q/:ID', {
 					controller: function (ID) {
 						var index = parseInt(ID, 10) - 1,
@@ -109,9 +122,7 @@ module.exports = function () {
 							}
 						});
 
-						var button = document.getElementById('submit'),
-							description = document.getElementById('description');
-						description.innerHTML = markdown(description.innerHTML);
+						var button = document.getElementById('submit');
 
 						// Initialize Question
 						var q = State.getQuestion(ID) || {ID: ID, lapsed: 0, attempts: 0, solution: null};
