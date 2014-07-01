@@ -7,7 +7,18 @@ module.exports = function (grunt) {
 			all: ['Gruntfile.js', 'src/**/*.js', 'test/**/*.js']
 		},
 		nodeunit: {
-			all: ['test/**/*.js']
+			all: ['test/nodeunit/**/*.js']
+		},
+		karma: {
+			options: {
+				configFile: 'karma.conf.js'
+			},
+			single: {
+				singleRun: true
+			},
+			continuous: {
+				singleRun: false
+			}
 		},
 		watch: {
 			all: {
@@ -39,7 +50,7 @@ module.exports = function (grunt) {
 		}
 	});
 
-	grunt.registerTask('test', ['jshint', 'nodeunit']);
+	grunt.registerTask('test', ['jshint', 'nodeunit', 'karma:single']);
 	grunt.registerTask('publish', ['browserify:dist', 'uglify:dist']);
 	grunt.registerTask('default', ['test', 'publish']);
 };
