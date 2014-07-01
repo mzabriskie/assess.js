@@ -108,42 +108,40 @@ module.exports = function () {
 								total: questions.length
 							}
 						});
-						var description = document.getElementById('description');
+
+						var button = document.getElementById('submit'),
+							description = document.getElementById('description');
 						description.innerHTML = markdown(description.innerHTML);
 
-						// Initialize CodeMirror, Timer, Assert and Question
+						// Initialize Question
+						var q = State.getQuestion(ID) || {ID: ID, lapsed: 0, attempts: 0, solution: null};
+						State.setQuestion(q);
+
+						// Check Read Only state
+						var readOnly = q.solution !== null;
+						if (readOnly) {
+							document.getElementById('code').value = q.solution;
+						}
+
+						// Initialize CodeMirror, Timer, and Assert
 						var callback = null,
 							code, assert;
 
 						code = CodeMirror.fromTextArea(document.getElementById('code'), {
 							lineNumbers: true,
-							matchBrackets: true
+							matchBrackets: true,
+							readOnly: readOnly
 						});
 
-						timer = new Timer().start();
-						assert = new Assert(questions[index].test,
-												function () { return callback.apply(null, arguments); },
-												function () { assess.log('Testing input "' + arguments[0] + '"...'); },
-												function () { assess.log(arguments[1] + ' is correct.', 'pass'); },
-												function () { assess.log('Expected ' + arguments[1] + ' but got ' + arguments[2], 'fail'); });
-
-						var q = State.getQuestion(ID) || {ID: ID, lapsed: 0, attempts: 0, solution: null};
-						State.setQuestion(q);
-						timer.lapsed = q.lapsed;
-
-						// Update lapsed time
+						// Helper functions
 						function updateLapsedTime() {
 							q.lapsed = timer.lapsed;
 							State.setQuestion(q);
 
 							document.getElementById('timer').innerHTML = duration(State.getLapsedTime() + timer.lapsed);
 						}
-						timer.on('tick', updateLapsedTime);
-						updateLapsedTime();
 
-						// Handle Done! click
-						var button = document.getElementById('submit');
-						button.onclick = function () {
+						function handleSubmitClick() {
 							button.disabled = true;
 							timer.stop();
 
@@ -166,21 +164,55 @@ module.exports = function () {
 
 								// Update submit click handler to redirect to next screen
 								button.innerHTML = 'Next';
-								button.onclick = function () {
-									var hash = '';
-									if (index + 1 < questions.length) {
-										hash = '/q/' + (index + 2);
-									} else {
-										hash = '/results';
-									}
-									router.redirect(hash);
-								};
+								button.onclick = handleNextClick;
 							}
-						};
+						}
+
+						function handleNextClick() {
+							var hash = '';
+							if (index + 1 < questions.length) {
+								hash = '/q/' + (index + 2);
+							} else {
+								hash = '/results';
+							}
+							router.redirect(hash);
+						}
+
+						// Only hook up assert and timer if solution hasn't already been provided
+						if (!readOnly) {
+							timer = new Timer().start();
+							timer.lapsed = q.lapsed;
+
+							assert = new Assert(questions[index].test,
+													function () { return callback.apply(null, arguments); },
+													function () { assess.log('Testing input "' + arguments[0] + '"...'); },
+													function () { assess.log(arguments[1] + ' is correct.', 'pass'); },
+													function () { assess.log('Expected ' + arguments[1] + ' but got ' + arguments[2], 'fail'); });
+
+							// Update lapsed time
+							timer.on('tick', updateLapsedTime);
+							updateLapsedTime();
+
+							// Handle Done! click
+							button.onclick = handleSubmitClick;
+						} else {
+							// Update lapsed time
+							document.getElementById('timer').innerHTML = duration(State.getLapsedTime());
+
+							// Handle Next click
+							button.innerHTML = 'Next';
+							button.onclick = handleNextClick;
+
+							// Log instructions
+							document.getElementById('console').innerHTML = '';
+							assess.log('Click Next to continue to the next question.', 'info');
+						}
 					},
 					beforeunload: function (e) {
 						/*if (!confirm('Are you sure?')) { e.stop(); }*/
-						State.setLapsedTime(State.getLapsedTime() + timer.lapsed);
+						if (timer) {
+							State.setLapsedTime(State.getLapsedTime() + timer.lapsed);
+						}
 						document.getElementById('submit').onclick = null;
 					}
 				})
