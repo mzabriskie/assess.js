@@ -31,6 +31,13 @@ describe('assess.js', function () {
 			expect(State.data).toEqual(getData());
 		});
 
+		it('should create localStorage if empty', function () {
+			localStorage.clear();
+			State.init();
+
+			expect(State.data).toEqual({});
+		});
+
 		it('should set lapsed time', function () {
 			State.setLapsedTime(100);
 

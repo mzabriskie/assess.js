@@ -3,6 +3,10 @@
 	var State = {
 		init: function () {
 			this.data = JSON.parse(localStorage.getItem(key));
+			if (this.data === null) {
+				this.data = {};
+				this.sync();
+			}
 		},
 
 		sync: function () {
