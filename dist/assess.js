@@ -1017,7 +1017,7 @@ Assert.prototype.test = function (index) {
 	try {
 		this.interim.call(null, assertion.input);
 		output = this.callback.call(null, assertion.input);
-		if (output !== assertion.output) {
+		if (!compare(output, assertion.output)) {
 			throw new Error();
 		} else {
 			this.success.call(null, index, output);
@@ -1028,6 +1028,29 @@ Assert.prototype.test = function (index) {
 	}
 	return result;
 };
+
+function compare(val1, val2) {
+	if (Array.isArray(val1) && Array.isArray(val2)) {
+		return compareArray(val1, val2);
+	}
+	else {
+		return val1 === val2;
+	}
+}
+
+function compareArray(arr1, arr2) {
+	if (arr1.length !== arr2.length) {
+		return false;
+	}
+
+	for (var i=0, l=arr1.length; i<l; i++) {
+		if (!compare(arr1[i], arr2[i])) {
+			return false;
+		}
+	}
+
+	return true;
+}
 
 module.exports = Assert;
 },{}],7:[function(_dereq_,module,exports){
@@ -1193,8 +1216,14 @@ module.exports = function () {
 							State.setQuestion(q);
 
 							// TODO: Gotta be something better than using eval
-							/*jshint evil:true*/
-							eval('callback = ' + code.getValue());
+							if (typeof questions[index].callback === 'function') {
+								/*jshint evil:true*/
+								eval(code.getValue());
+								callback = questions[index].callback;
+							} else {
+								/*jshint evil:true*/
+								eval('callback = ' + code.getValue());
+							}
 
 							button.disabled = false;
 
@@ -1253,7 +1282,7 @@ module.exports = function () {
 						}
 					},
 					beforeunload: function (e) {
-						/*if (!confirm('Are you sure?')) { e.stop(); }*/
+						// TODO: Persist code value if it hasn't already
 						if (timer) {
 							timer.stop();
 							State.setLapsedTime(State.getLapsedTime() + timer.lapsed);
@@ -1283,6 +1312,8 @@ module.exports = function () {
 	return assess;
 };
 },{"./assert":6,"./router":8,"./state":9,"./timer":10}],8:[function(_dereq_,module,exports){
+(function () {
+
 // Facade for adding DOM events
 function addEvent(el, event, handler) {
 	if (el.attachEvent) {
@@ -1310,6 +1341,9 @@ function trim(str) {
 // Normalize the hash
 function normalize(hash) {
 	hash = trim(hash);
+	if (hash.indexOf('#') === 0) {
+		hash = hash.substring(1);
+	}
 	if (hash.indexOf('/') !== 0) {
 		hash = '/' + hash;
 	}
@@ -1327,7 +1361,7 @@ function Router() {
 }
 
 Router.prototype.hash = function () {
-	return window.location.hash.replace(/^#\/?/, '');
+	return window.location.hash.replace(/^#?/, '');
 };
 
 Router.prototype.redirect = function (hash) {
@@ -1361,7 +1395,7 @@ Router.prototype.process = function (hash) {
 	hash = normalize(hash);
 
 	// Don't handle hash if it hasn't changed
-	if (this.current !== null && this.current.hash === hash) {
+	if (this.current != null && this.current.hash === hash) {
 		return this;
 	}
 
@@ -1392,7 +1426,7 @@ Router.prototype.process = function (hash) {
 	}
 
 	// Handle before unload if current route specified a handler
-	if (this.current !== null && typeof this.current.route.beforeunload === 'function') {
+	if (this.current != null && typeof this.current.route.beforeunload === 'function') {
 		// Provide stoppable event
 		var event = {
 			stopped: false,
@@ -1431,7 +1465,13 @@ Router.prototype.process = function (hash) {
 	return this;
 };
 
-module.exports = Router;
+if (typeof module !== 'undefined') {
+	module.exports = Router;
+} else {
+	this.Router = Router;
+}
+
+}).call(this);
 },{}],9:[function(_dereq_,module,exports){
 (function () {
 	var key = 'assess';

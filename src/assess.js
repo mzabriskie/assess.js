@@ -82,6 +82,7 @@ module.exports = function () {
 					}.bind(this);
 				})
 				.when('/results', function () {
+					// TODO: Skipping question results in error (/q/1 -> /results)
 					var qs = [];
 					for (var i=0, l=questions.length; i<l; i++) {
 						var q = questions[i],
@@ -160,8 +161,14 @@ module.exports = function () {
 							State.setQuestion(q);
 
 							// TODO: Gotta be something better than using eval
-							/*jshint evil:true*/
-							eval('callback = ' + code.getValue());
+							if (typeof questions[index].callback === 'function') {
+								/*jshint evil:true*/
+								eval(code.getValue());
+								callback = questions[index].callback;
+							} else {
+								/*jshint evil:true*/
+								eval('callback = ' + code.getValue());
+							}
 
 							button.disabled = false;
 
@@ -220,7 +227,7 @@ module.exports = function () {
 						}
 					},
 					beforeunload: function (e) {
-						/*if (!confirm('Are you sure?')) { e.stop(); }*/
+						// TODO: Persist code value if it hasn't already
 						if (timer) {
 							timer.stop();
 							State.setLapsedTime(State.getLapsedTime() + timer.lapsed);
