@@ -3,7 +3,8 @@ module.exports = function () {
 
 	var Router = require('./router'),
 		Timer = require('./timer'),
-		Assert = require('./assert');
+		Assert = require('./assert'),
+		State = require('./state');
 
 	// Cache compiled templates and render to container
 	var templates = {},
@@ -66,11 +67,12 @@ module.exports = function () {
 		return md.replace(/`(.*?)`/g, '<code>$1</code>');
 	}
 
-	var lapsed = 0,
-		timer = null;
+	var timer = null;
 
 	var assess = {
 		init: function (questions) {
+			State.init();
+
 			var router = new Router()
 				.when('/', function () {
 					renderContent('home-template');
@@ -109,7 +111,7 @@ module.exports = function () {
 						var description = document.getElementById('description');
 						description.innerHTML = markdown(description.innerHTML);
 
-						// Initialize CodeMirror, Timer and Assert
+						// Initialize CodeMirror, Timer, Assert and Question
 						var callback = null,
 							code, assert;
 
@@ -125,9 +127,16 @@ module.exports = function () {
 												function () { assess.log(arguments[1] + ' is correct.', 'pass'); },
 												function () { assess.log('Expected ' + arguments[1] + ' but got ' + arguments[2], 'fail'); });
 
+						var q = State.getQuestion(ID) || {ID: ID, lapsed: 0, attempts: 0, solution: null};
+						State.setQuestion(q);
+						timer.lapsed = q.lapsed;
+
 						// Update lapsed time
 						function updateLapsedTime() {
-							document.getElementById('timer').innerHTML = duration(lapsed + timer.lapsed);
+							q.lapsed = timer.lapsed;
+							State.setQuestion(q);
+
+							document.getElementById('timer').innerHTML = duration(State.getLapsedTime() + timer.lapsed);
 						}
 						timer.on('tick', updateLapsedTime);
 						updateLapsedTime();
@@ -138,6 +147,9 @@ module.exports = function () {
 							button.disabled = true;
 							timer.stop();
 
+							q.attempts += 1;
+							State.setQuestion(q);
+
 							// TODO: Gotta be something better than using eval
 							/*jshint evil:true*/
 							eval('callback = ' + code.getValue());
@@ -147,6 +159,9 @@ module.exports = function () {
 							if (!assert.testAll()) {
 								timer.start();
 							} else {
+								q.solution = code.getValue();
+								State.setQuestion(q);
+
 								assess.log('Nice work! Click Next to continue to the next question.', 'info');
 
 								// Update submit click handler to redirect to next screen
@@ -165,7 +180,7 @@ module.exports = function () {
 					},
 					beforeunload: function (e) {
 						/*if (!confirm('Are you sure?')) { e.stop(); }*/
-						lapsed += timer.lapsed;
+						State.setLapsedTime(State.getLapsedTime() + timer.lapsed);
 						document.getElementById('submit').onclick = null;
 					}
 				})

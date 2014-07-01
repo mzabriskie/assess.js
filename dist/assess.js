@@ -1036,7 +1036,8 @@ module.exports = function () {
 
 	var Router = _dereq_('./router'),
 		Timer = _dereq_('./timer'),
-		Assert = _dereq_('./assert');
+		Assert = _dereq_('./assert'),
+		State = _dereq_('./state');
 
 	// Cache compiled templates and render to container
 	var templates = {},
@@ -1099,11 +1100,12 @@ module.exports = function () {
 		return md.replace(/`(.*?)`/g, '<code>$1</code>');
 	}
 
-	var lapsed = 0,
-		timer = null;
+	var timer = null;
 
 	var assess = {
 		init: function (questions) {
+			State.init();
+
 			var router = new Router()
 				.when('/', function () {
 					renderContent('home-template');
@@ -1142,7 +1144,7 @@ module.exports = function () {
 						var description = document.getElementById('description');
 						description.innerHTML = markdown(description.innerHTML);
 
-						// Initialize CodeMirror, Timer and Assert
+						// Initialize CodeMirror, Timer, Assert and Question
 						var callback = null,
 							code, assert;
 
@@ -1158,9 +1160,16 @@ module.exports = function () {
 												function () { assess.log(arguments[1] + ' is correct.', 'pass'); },
 												function () { assess.log('Expected ' + arguments[1] + ' but got ' + arguments[2], 'fail'); });
 
+						var q = State.getQuestion(ID) || {ID: ID, lapsed: 0, attempts: 0, solution: null};
+						State.setQuestion(q);
+						timer.lapsed = q.lapsed;
+
 						// Update lapsed time
 						function updateLapsedTime() {
-							document.getElementById('timer').innerHTML = duration(lapsed + timer.lapsed);
+							q.lapsed = timer.lapsed;
+							State.setQuestion(q);
+
+							document.getElementById('timer').innerHTML = duration(State.getLapsedTime() + timer.lapsed);
 						}
 						timer.on('tick', updateLapsedTime);
 						updateLapsedTime();
@@ -1171,6 +1180,9 @@ module.exports = function () {
 							button.disabled = true;
 							timer.stop();
 
+							q.attempts += 1;
+							State.setQuestion(q);
+
 							// TODO: Gotta be something better than using eval
 							/*jshint evil:true*/
 							eval('callback = ' + code.getValue());
@@ -1180,6 +1192,9 @@ module.exports = function () {
 							if (!assert.testAll()) {
 								timer.start();
 							} else {
+								q.solution = code.getValue();
+								State.setQuestion(q);
+
 								assess.log('Nice work! Click Next to continue to the next question.', 'info');
 
 								// Update submit click handler to redirect to next screen
@@ -1198,7 +1213,7 @@ module.exports = function () {
 					},
 					beforeunload: function (e) {
 						/*if (!confirm('Are you sure?')) { e.stop(); }*/
-						lapsed += timer.lapsed;
+						State.setLapsedTime(State.getLapsedTime() + timer.lapsed);
 						document.getElementById('submit').onclick = null;
 					}
 				})
@@ -1223,7 +1238,7 @@ module.exports = function () {
 
 	return assess;
 };
-},{"./assert":6,"./router":8,"./timer":9}],8:[function(_dereq_,module,exports){
+},{"./assert":6,"./router":8,"./state":9,"./timer":10}],8:[function(_dereq_,module,exports){
 // Facade for adding DOM events
 function addEvent(el, event, handler) {
 	if (el.attachEvent) {
@@ -1374,6 +1389,54 @@ Router.prototype.process = function (hash) {
 
 module.exports = Router;
 },{}],9:[function(_dereq_,module,exports){
+(function () {
+	var key = 'assess';
+	var State = {
+		init: function () {
+			this.data = JSON.parse(localStorage.getItem(key));
+			if (this.data === null) {
+				this.data = {
+					lapsed: 0,
+					questions: []
+				};
+				this.sync();
+			}
+		},
+
+		sync: function () {
+			localStorage.setItem(key, JSON.stringify(this.data));
+		},
+
+		setLapsedTime: function (lapsed) {
+			this.data.lapsed = lapsed;
+			this.sync();
+		},
+
+		getLapsedTime: function () {
+			return this.data.lapsed;
+		},
+
+		getQuestions: function () {
+			return this.data.questions;
+		},
+
+		setQuestion: function (question) {
+			this.data.questions[question.ID - 1] = question;
+			this.sync();
+		},
+
+		getQuestion: function (ID) {
+			return this.data.questions[ID - 1];
+		}
+	};
+
+	if (typeof module !== 'undefined') {
+		module.exports = State;
+	} else {
+		this.State = State;
+	}
+}).call(this);
+},{}],10:[function(_dereq_,module,exports){
 var util = _dereq_('util'),
 	EventEmitter = _dereq_('events').EventEmitter;
 
