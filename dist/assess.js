@@ -1128,7 +1128,8 @@ module.exports = function () {
 	// Handle meta + Enter
 	function handleMetaEnter(f) {
 		return function (e) {
-			if (e.keyCode === 13 && e.metaKey === true) {
+			var isMac = navigator.platform.indexOf('Mac') > -1;
+			if (e.keyCode === 13 && (isMac ? e.metaKey === true : e.ctrlKey === true)) {
 				if (typeof e.stop === 'function') {
 					e.stop();
 				}
