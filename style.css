@@ -25,8 +25,9 @@ code {
 }
 
 button {
-	background:#3275C1;
-	border:1px solid #2767B2;
+	background:#4298ED;
+	border:1px solid #2b80d2;
+	text-shadow:0 1px 1px #2b80d2;
 	border-radius:5px;
 	-moz-border-radius:5px;
 	-webkit-border-radius:5px;
