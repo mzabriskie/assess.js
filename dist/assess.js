@@ -1186,6 +1186,11 @@ module.exports = function () {
 		return new Handlebars.SafeString(text.replace(/`(.*?)`/g, '<code>$1</code>'));
 	});
 
+	// Handlebars helper to pluralize
+	Handlebars.registerHelper('pluralize', function (count, singular, plural) {
+		return count > 1 ? plural : singular;
+	});
+
 	var timer = null,
 		interval = null;
 

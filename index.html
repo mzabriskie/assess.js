@@ -17,7 +17,7 @@
 			{{#each questions}}
 			<li>
 				<a href="#/q/{{ math @index '+' 1 }}">{{ name }}</a>
-				<span>{{ attempts }} attempts - {{ lapsed }}</span>
+				<span>{{ attempts }} {{ pluralize attempts 'attempt' 'attempts' }} - {{ lapsed }}</span>
 				<p>{{ markdown description }}</p>
 			</li>
 			{{/each}}
