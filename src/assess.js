@@ -58,6 +58,24 @@ module.exports = function () {
 		};
 	}
 
+	// Get next button action labels
+	function getNextActionLabels(index, questions) {
+		var button, console;
+
+		if (index + 1 < questions.length) {
+			button = 'Next';
+			console = 'Click Next to continue to the next question.';
+		} else {
+			button = 'Finish';
+			console = 'Click Finish to see your results.';
+		}
+
+		return {
+			button: button,
+			console: console
+		};
+	}
+
 	// Handlebars helper to support math operations on @index
 	// http://jsfiddle.net/mpetrovich/wMmHS/
 	Handlebars.registerHelper('math', function(lvalue, operator, rvalue, options) {
@@ -200,10 +218,11 @@ module.exports = function () {
 								q.completed = true;
 								updateSolution();
 
-								assess.log('Nice work! Click Next to continue to the next question.', 'info');
+								var labels = getNextActionLabels(index, questions);
+								assess.log('Nice work! ' + labels.console, 'info');
 
 								// Update submit click handler to redirect to next screen
-								button.innerHTML = 'Next';
+								button.innerHTML = labels.button;
 								button.onclick = handleNextClick;
 								window.onkeydown = handleMetaEnter(handleNextClick);
 							}
@@ -239,20 +258,21 @@ module.exports = function () {
 
 							// Handle Done! click
 							button.onclick = handleSubmitClick;
-
-							// Handle ⌘+Enter
 							window.onkeydown = handleMetaEnter(handleSubmitClick);
 						} else {
+							var labels = getNextActionLabels(index, questions);
+
 							// Update lapsed time
 							document.getElementById('timer').innerHTML = duration(State.getLapsedTime());
 
 							// Handle Next click
-							button.innerHTML = 'Next';
+							button.innerHTML = labels.button;
 							button.onclick = handleNextClick;
+							window.onkeydown = handleMetaEnter(handleNextClick);
 
 							// Log instructions
 							document.getElementById('console').innerHTML = '';
-							assess.log('Click Next to continue to the next question.', 'info');
+							assess.log(labels.console, 'info');
 						}
 					},
 					beforeunload: function () {
