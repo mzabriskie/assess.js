@@ -44,7 +44,15 @@ button {
 	display:block;
 	font-size:6vmin;
 	padding:50px;
+	outline:none;
 }
+button:hover {
+	background:#3d8dd9;
+}
+button:focus {
+	background:#3378b8;
+}
+
 button[disabled] {
 	background: #cccccc;
 	border:1px solid #aaaaaa;
