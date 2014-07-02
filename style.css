@@ -24,6 +24,15 @@ code {
 	text-shadow:#fff 0 1px;
 }
 
+a {
+	color:#4298ED;
+	font-weight:bold;
+	text-decoration:none;
+}
+a:hover {
+	text-decoration:underline;
+}
+
 button {
 	background:#4298ED;
 	border:1px solid #2b80d2;
