@@ -1088,7 +1088,8 @@ module.exports = function () {
 	var Router = _dereq_('./router'),
 		Timer = _dereq_('./timer'),
 		Assert = _dereq_('./assert'),
-		State = _dereq_('./state');
+		State = _dereq_('./state'),
+		Console = _dereq_('./console');
 
 	// Cache compiled templates and render to container
 	var templates = {},
@@ -1193,7 +1194,8 @@ module.exports = function () {
 	});
 
 	var timer = null,
-		interval = null;
+		interval = null,
+		standardConsole = window.console;
 
 	var assess = {
 		init: function (questions) {
@@ -1247,6 +1249,9 @@ module.exports = function () {
 								total: questions.length
 							}
 						});
+
+						// Hijack console
+						window.console = new Console(document.getElementById('console'));
 
 						var button = document.getElementById('submit');
 
@@ -1372,6 +1377,10 @@ module.exports = function () {
 						if (interval) {
 							clearTimeout(interval);
 						}
+
+						// Restore console
+						window.console = standardConsole;
+
 						document.getElementById('submit').onclick = null;
 						window.onkeydown = null;
 					}
@@ -1382,22 +1391,43 @@ module.exports = function () {
 			return this;
 		},
 		log: function (message, type) {
-			var out = document.createElement('div'),
-				console = document.getElementById('console');
-			console.appendChild(out);
-			out.innerHTML = message;
-			if (typeof type !== 'undefined') {
-				out.className = type;
-			}
-			console.scrollTop = console.scrollHeight;
-
-			return this;
+			console.__log(message, type);
 		}
 	};
 
 	return assess;
 };
-},{"./assert":6,"./router":8,"./state":9,"./timer":10}],8:[function(_dereq_,module,exports){
+},{"./assert":6,"./console":8,"./router":9,"./state":10,"./timer":11}],8:[function(_dereq_,module,exports){
+(function () {
+	function Console(element) {
+		this.outlet = element;
+	}
+
+	Console.prototype.__log = function (message, type) {
+		var el = document.createElement('div');
+		el.appendChild(document.createTextNode(message));
+		if (typeof type !== 'undefined') {
+			el.className = type;
+		}
+		this.outlet.appendChild(el);
+		this.outlet.scrollTop = this.outlet.scrollHeight;
+	};
+
+	Console.prototype.log = function () {
+		var message = [];
+		for (var i=0, l=arguments.length; i<l; i++) {
+			message.push(arguments[i]);
+		}
+		this.__log(message.join(' '));
+	};
+
+	if (typeof module !== 'undefined') {
+		module.exports = Console;
+	} else {
+		this.Console = Console;
+	}
+}).call(this);
+},{}],9:[function(_dereq_,module,exports){
 (function () {
 
 // Facade for adding DOM events
@@ -1558,7 +1588,7 @@ if (typeof module !== 'undefined') {
 }
 
 }).call(this);
-},{}],9:[function(_dereq_,module,exports){
+},{}],10:[function(_dereq_,module,exports){
 (function () {
 	var key = 'assess';
 	var State = {
@@ -1606,7 +1636,7 @@ if (typeof module !== 'undefined') {
 		this.State = State;
 	}
 }).call(this);
-},{}],10:[function(_dereq_,module,exports){
+},{}],11:[function(_dereq_,module,exports){
 var util = _dereq_('util'),
 	EventEmitter = _dereq_('events').EventEmitter;
 

@@ -4,7 +4,8 @@ module.exports = function () {
 	var Router = require('./router'),
 		Timer = require('./timer'),
 		Assert = require('./assert'),
-		State = require('./state');
+		State = require('./state'),
+		Console = require('./console');
 
 	// Cache compiled templates and render to container
 	var templates = {},
@@ -109,7 +110,8 @@ module.exports = function () {
 	});
 
 	var timer = null,
-		interval = null;
+		interval = null,
+		standardConsole = window.console;
 
 	var assess = {
 		init: function (questions) {
@@ -163,6 +165,9 @@ module.exports = function () {
 								total: questions.length
 							}
 						});
+
+						// Hijack console
+						window.console = new Console(document.getElementById('console'));
 
 						var button = document.getElementById('submit');
 
@@ -288,6 +293,10 @@ module.exports = function () {
 						if (interval) {
 							clearTimeout(interval);
 						}
+
+						// Restore console
+						window.console = standardConsole;
+
 						document.getElementById('submit').onclick = null;
 						window.onkeydown = null;
 					}
@@ -298,16 +307,7 @@ module.exports = function () {
 			return this;
 		},
 		log: function (message, type) {
-			var out = document.createElement('div'),
-				console = document.getElementById('console');
-			console.appendChild(out);
-			out.innerHTML = message;
-			if (typeof type !== 'undefined') {
-				out.className = type;
-			}
-			console.scrollTop = console.scrollHeight;
-
-			return this;
+			console.__log(message, type);
 		}
 	};
 
