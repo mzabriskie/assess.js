@@ -261,7 +261,7 @@ module.exports = function () {
 													function () { return callback.apply(null, arguments); },
 													function () { assess.log('Testing input "' + arguments[0] + '"...'); },
 													function () { assess.log(arguments[1] + ' is correct.', 'pass'); },
-													function () { assess.log('Expected ' + arguments[1] + ' but got ' + arguments[2], 'fail'); });
+													function () { assess.log('Expected ' + arguments[1] + ' but got ' + arguments[2], 'error'); });
 
 							// Update lapsed time
 							timer.on('tick', updateLapsedTime);

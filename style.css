@@ -134,11 +134,14 @@ button[disabled] {
 #console .pass {
 	color:#80bf40;
 }
-#console .fail {
+#console .error {
 	color:#ff3333;
 }
 #console .info {
-	color: #bf7632;
+	color: #0069FF;
+}
+#console .warn {
+	color: #D39D00;
 }
 
 .CodeMirror {
