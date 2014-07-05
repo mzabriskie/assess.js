@@ -164,14 +164,46 @@ describe('assess.js', function () {
 		describe('time', function () {
 			it('should provide time method', function () {
 				expect(typeof console.time).toEqual('function');
-				expect(console.time).toEqual(console.__notimpl);
+			});
+
+			it('should start a new timer', function () {
+				console.time('foo');
+				expect(typeof console.__timer.foo).toEqual('number');
 			});
 		});
 
 		describe('timeEnd', function () {
 			it('should provide timeEnd method', function () {
 				expect(typeof console.timeEnd).toEqual('function');
-				expect(console.timeEnd).toEqual(console.__notimpl);
+			});
+
+			it('should print the elapsed time', function () {
+				var called = false;
+
+				runs(function () {
+					console.time('foo');
+					setTimeout(function () {
+						called = true;
+					}, 1000);
+				});
+
+				waitsFor(function () {
+					return called;
+				});
+
+				runs(function () {
+					console.timeEnd('foo');
+					expect(console.outlet.children.length).toEqual(1);
+					expect(console.outlet.children[0].innerHTML.substring(0, 6)).toEqual('foo: 1');
+					expect(console.outlet.children[0].innerHTML.substring(9)).toEqual('ms');
+					expect(typeof console.__timer.foo).toEqual('undefined');
+				});
+
+			});
+
+			it('should do nothing if timer hasn\'t been specified', function () {
+				console.timeEnd('bar');
+				expect(console.outlet.children.length).toEqual(0);
 			});
 		});
 

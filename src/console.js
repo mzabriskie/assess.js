@@ -70,8 +70,24 @@
 
 	Console.prototype.profile = Console.prototype.__notimpl;
 	Console.prototype.profileEnd = Console.prototype.__notimpl;
-	Console.prototype.time = Console.prototype.__notimpl;
-	Console.prototype.timeEnd = Console.prototype.__notimpl;
+
+	Console.prototype.time = function (label) {
+		if (typeof this.__timer === 'undefined') {
+			this.__timer = {};
+		}
+
+		this.__timer[label] = Date.now();
+	};
+
+	Console.prototype.timeEnd = function (label) {
+		var now = Date.now();
+		if (typeof this.__timer !== 'undefined' &&
+			typeof this.__timer[label] !== 'undefined') {
+			this.__log(label + ': ' + (now - this.__timer[label] + 'ms'));
+			delete this.__timer[label];
+		}
+	};
+
 	Console.prototype.timeline = Console.prototype.__notimpl;
 	Console.prototype.timelineEnd = Console.prototype.__notimpl;
 	Console.prototype.timeStamp = Console.prototype.__notimpl;
