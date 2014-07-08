@@ -12,8 +12,13 @@
 	}
 
 	Console.prototype.__log = function (message, type) {
-		var el = document.createElement('div');
+		var el = document.createElement('div'),
+			img = document.createElement('img');
+
+		img.src = '/assets/img/px.png';
+		el.appendChild(img);
 		el.appendChild(document.createTextNode(message));
+
 		if (typeof type !== 'undefined') {
 			el.className = type;
 		}

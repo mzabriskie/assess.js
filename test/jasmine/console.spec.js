@@ -29,7 +29,7 @@ describe('assess.js', function () {
 			it('should log an error if expression is false', function () {
 				console.assert(false, 'foo');
 				expect(console.outlet.children.length).toEqual(1);
-				expect(console.outlet.children[0].innerHTML).toEqual('foo');
+				expect(console.outlet.children[0].innerHTML).toEqual('<img src="/assets/img/px.png">foo');
 				expect(console.outlet.children[0].className).toEqual('error');
 			});
 		});
@@ -59,11 +59,11 @@ describe('assess.js', function () {
 				bar(); bar();
 
 				expect(console.outlet.children.length).toEqual(5);
-				expect(console.outlet.children[0].innerHTML).toEqual('foo: 1');
-				expect(console.outlet.children[1].innerHTML).toEqual('foo: 2');
-				expect(console.outlet.children[2].innerHTML).toEqual('foo: 3');
-				expect(console.outlet.children[3].innerHTML).toEqual('bar: 1');
-				expect(console.outlet.children[4].innerHTML).toEqual('bar: 2');
+				expect(console.outlet.children[0].innerHTML).toEqual('<img src="/assets/img/px.png">foo: 1');
+				expect(console.outlet.children[1].innerHTML).toEqual('<img src="/assets/img/px.png">foo: 2');
+				expect(console.outlet.children[2].innerHTML).toEqual('<img src="/assets/img/px.png">foo: 3');
+				expect(console.outlet.children[3].innerHTML).toEqual('<img src="/assets/img/px.png">bar: 1');
+				expect(console.outlet.children[4].innerHTML).toEqual('<img src="/assets/img/px.png">bar: 2');
 			});
 		});
 
@@ -96,7 +96,7 @@ describe('assess.js', function () {
 			it('should log all arguments', function () {
 				console.error('foo', 'bar', 'baz');
 				expect(console.outlet.children.length).toEqual(1);
-				expect(console.outlet.children[0].innerHTML).toEqual('foo bar baz');
+				expect(console.outlet.children[0].innerHTML).toEqual('<img src="/assets/img/px.png">foo bar baz');
 				expect(console.outlet.children[0].className).toEqual('error');
 			});
 		});
@@ -130,7 +130,7 @@ describe('assess.js', function () {
 			it('should log all arguments', function () {
 				console.info('foo', 'bar', 'baz');
 				expect(console.outlet.children.length).toEqual(1);
-				expect(console.outlet.children[0].innerHTML).toEqual('foo bar baz');
+				expect(console.outlet.children[0].innerHTML).toEqual('<img src="/assets/img/px.png">foo bar baz');
 				expect(console.outlet.children[0].className).toEqual('info');
 			});
 		});
@@ -143,7 +143,7 @@ describe('assess.js', function () {
 			it('should log all arguments', function () {
 				console.log('foo', 'bar', 'baz');
 				expect(console.outlet.children.length).toEqual(1);
-				expect(console.outlet.children[0].innerHTML).toEqual('foo bar baz');
+				expect(console.outlet.children[0].innerHTML).toEqual('<img src="/assets/img/px.png">foo bar baz');
 			});
 		});
 
@@ -193,9 +193,11 @@ describe('assess.js', function () {
 
 				runs(function () {
 					console.timeEnd('foo');
+					var html = console.outlet.children[0].innerHTML;
+					html = html.replace(/<img.*?>/, '');
 					expect(console.outlet.children.length).toEqual(1);
-					expect(console.outlet.children[0].innerHTML.substring(0, 6)).toEqual('foo: 1');
-					expect(console.outlet.children[0].innerHTML.substring(9)).toEqual('ms');
+					expect(html.substring(0, 6)).toEqual('foo: 1');
+					expect(html.substring(9)).toEqual('ms');
 					expect(typeof console.__timer.foo).toEqual('undefined');
 				});
 
@@ -243,7 +245,7 @@ describe('assess.js', function () {
 			it('should log all arguments', function () {
 				console.warn('foo', 'bar', 'baz');
 				expect(console.outlet.children.length).toEqual(1);
-				expect(console.outlet.children[0].innerHTML).toEqual('foo bar baz');
+				expect(console.outlet.children[0].innerHTML).toEqual('<img src="/assets/img/px.png">foo bar baz');
 				expect(console.outlet.children[0].className).toEqual('warn');
 			});
 		});

@@ -130,18 +130,42 @@ button[disabled] {
 }
 #console div {
 	padding:2.5px 5px;
+	/*padding:2.5px 5px 2.5px 26px;*/
+	position:relative;
+}
+#console div img {
+	display:none;
+	background:url(../img/console-icons.png) no-repeat -100px 0;
+	width:16px;
+	height:16px;
+	vertical-align:middle;
+	position:absolute;
+	top:4px;
+	left:5px;
 }
 #console .pass {
 	color:#80bf40;
 }
+#console .pass img {
+	background-position:0 -48px;
+}
 #console .error {
 	color:#ff3333;
+}
+#console .error img {
+	background-position:0 -32px;
 }
 #console .info {
 	color: #0069FF;
 }
+#console .info img {
+	background-position:0 0;
+}
 #console .warn {
 	color: #D39D00;
+}
+#console .warn img {
+	background-position:0 -16px;
 }
 
 .CodeMirror {
